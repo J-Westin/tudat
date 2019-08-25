@@ -29,6 +29,8 @@
 #include "Tudat/Astrodynamics/Propulsion/massRateFromThrust.h"
 #include "Tudat/Astrodynamics/ElectroMagnetism/solarSailAcceleration.h"
 
+#include "Tudat/Astrodynamics/Relativity/jw_acceleration.h"
+
 namespace tudat
 {
 
@@ -62,8 +64,8 @@ enum AvailableAcceleration
     panelled_radiation_pressure_acceleration,
     momentum_wheel_desaturation_acceleration,
     solar_sail_acceleration,
-    
-    jw_relativity
+
+    jw_acceleration
 };
 
 //! Function to get a string representing a 'named identification' of an acceleration type

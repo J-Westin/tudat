@@ -1422,7 +1422,7 @@ std::shared_ptr< AccelerationModel< Eigen::Vector3d > > createAccelerationModel(
                     nameOfBodyExertingAcceleration );
         break;
 
-    case jw_relativity:
+    case jw_acceleration:
         accelerationModelPointer = create_jw_acceleration(
             bodyUndergoingAcceleration,
             bodyExertingAcceleration,

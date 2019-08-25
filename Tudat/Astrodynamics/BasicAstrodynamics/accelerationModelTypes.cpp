@@ -172,6 +172,11 @@ AvailableAcceleration getAccelerationModelType(
     {
         accelerationType = solar_sail_acceleration;
     }
+
+    else if ( std::dynamic_pointer_cast< jw::jw_acceleration > (accelerationModel) != nullptr ) {
+        accelerationType = jw_acceleration;
+    }
+
     else
     {
         throw std::runtime_error(
