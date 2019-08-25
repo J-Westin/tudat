@@ -27,6 +27,8 @@
 #include "Tudat/SimulationSetup/PropagationSetup/createAccelerationModels.h"
 #include "Tudat/SimulationSetup/EnvironmentSetup/createFlightConditions.h"
 
+#include "Tudat/Astrodynamics/Relativity/jw_acceleration.h"
+
 namespace tudat
 {
 
@@ -1225,7 +1227,7 @@ std::shared_ptr< gravitation::DirectTidalDissipationAcceleration > createDirectT
                         bodyUndergoingAcceleration->getGravityFieldModel( ) )->getReferenceRadius( );
         }
     }
-    
+
 
     if( tidalAccelerationSettings->useTideRaisedOnPlanet_ )
     {
@@ -1284,6 +1286,30 @@ std::shared_ptr< propulsion::MomentumWheelDesaturationThrustAcceleration > creat
                 desaturationAccelerationSettings->deltaVValues_,
                 desaturationAccelerationSettings->totalManeuverTime_,
                 desaturationAccelerationSettings->maneuverRiseTime_ );
+}
+
+std::shared_ptr< jw::jw_acceleration >
+    create_jw_acceleration(
+        const std::shared_ptr< Body > body_subject,
+        const std::shared_ptr< Body > body_actor,
+        const std::string& name_subject,
+        const std::string& name_actor
+    ) {
+
+    std::function< Eigen::Vector6d() > state_function_subject =
+        std::bind( &Body::getState, body_subject );
+
+    std::function< Eigen::Vector6d() > state_function_actor =
+        std::bind( &Body::getState, body_actor );
+
+    std::function< double() > mu_function_actor =
+        std::bind( &GravityFieldModel::getGravitationalParameter, body_actor->getGravityFieldModel() );
+
+    return std::make_shared< jw::jw_acceleration > (
+        state_function_subject,
+        state_function_actor,
+        mu_function_actor
+    );
 }
 
 //! Function to create acceleration model object.
@@ -1395,6 +1421,16 @@ std::shared_ptr< AccelerationModel< Eigen::Vector3d > > createAccelerationModel(
                     nameOfBodyUndergoingAcceleration,
                     nameOfBodyExertingAcceleration );
         break;
+
+    case jw_relativity:
+        accelerationModelPointer = create_jw_acceleration(
+            bodyUndergoingAcceleration,
+            bodyExertingAcceleration,
+            nameOfBodyUndergoingAcceleration,
+            nameOfBodyExertingAcceleration
+        );
+        break;
+
     default:
         throw std::runtime_error(
                     std::string( "Error, acceleration model ") +

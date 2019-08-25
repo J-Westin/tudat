@@ -28,6 +28,8 @@
 #include "Tudat/Astrodynamics/Ephemerides/frameManager.h"
 #include "Tudat/Astrodynamics/Gravitation/directTidalDissipationAcceleration.h"
 
+#include "Tudat/Astrodynamics/Relativity/jw_acceleration.h"
+
 namespace tudat
 {
 
@@ -432,6 +434,16 @@ std::shared_ptr< basic_astrodynamics::EmpiricalAcceleration > createEmpiricalAcc
         const std::string& nameOfBodyUndergoingAcceleration,
         const std::string& nameOfBodyExertingAcceleration,
         const std::shared_ptr< AccelerationSettings > accelerationSettings );
+
+
+
+std::shared_ptr< jw::jw_acceleration >
+    create_jw_acceleration(
+        const std::shared_ptr< Body > body_subject,
+        const std::shared_ptr< Body > body_actor,
+        const std::string& name_subject,
+        const std::string& name_actor
+    );
 
 
 //! Function to create acceleration model object.
