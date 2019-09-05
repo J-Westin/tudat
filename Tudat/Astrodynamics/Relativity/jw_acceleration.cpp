@@ -28,7 +28,7 @@ namespace jw {
 //        return output_vector;
     }
 
-    Eigen::Vector3d velocity_acceleration(
+    Eigen::Vector3d cb_velocity_acceleration(
         Eigen::Vector6d state_subject,
         Eigen::Vector6d state_actor,
         double mu_actor

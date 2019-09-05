@@ -345,6 +345,15 @@ int getDependentVariableSize(
     case radiation_pressure_coefficient_dependent_variable:
         variableSize = 1;
         break;
+
+    case jw_acceleration_schwarzschild_dependent_variable:
+        variableSize = 1;
+        break;
+
+    case jw_acceleration_components_dependent_variable:
+        variableSize = 6; // newton, kinetic, schwarzschild, desitter, velocity, acceleration
+        break;
+
     default:
         std::string errorMessage = "Error, did not recognize dependent variable size of type: " +
                 std::to_string( dependentVariableSettings->dependentVariableType_ );

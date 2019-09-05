@@ -1309,6 +1309,8 @@ std::shared_ptr< jw::jw_acceleration >
         );
     }
 
+    jw_settings->check_validity();
+
 //    if ( std::dynamic_pointer_cast< simulation_setup::jw_acceleration_settings > (acceleration_settings) == nullptr ) {
 //        std::cout << __FILE__ << std::endl;
 //        std::cout << __LINE__ << std::endl;
@@ -1329,7 +1331,11 @@ std::shared_ptr< jw::jw_acceleration >
         state_function_actor,
         mu_function_actor,
         jw_settings->newton,
-        jw_settings->schwarzschild
+        jw_settings->kinetic,
+        jw_settings->schwarzschild,
+        jw_settings->de_sitter,
+        jw_settings->cb_velocity,
+        jw_settings->cb_acceleration
     );
 }
 

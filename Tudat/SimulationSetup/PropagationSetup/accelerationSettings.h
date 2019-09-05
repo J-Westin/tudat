@@ -557,7 +557,6 @@ public:
 
     Eigen::Vector3d cb_angular_momentum;
 
-
     // ~ Constructor ~ //
     jw_acceleration_settings (
         const bool newton = false,
@@ -588,20 +587,21 @@ public:
             throw std::runtime_error("Kinetic correction term has not been implemented.");
         }
 
-        if (schwarzschild) {
-            YEET_DEBUG;
-            throw std::runtime_error("Schwarzschild acceleration has not been implemented.");
-        }
+//        if (schwarzschild) {
+//            YEET_DEBUG;
+//            throw std::runtime_error("Schwarzschild acceleration has not been implemented.");
+//        }
 
         if (de_sitter) {
             YEET_DEBUG;
             throw std::runtime_error("De Sitter correction has not been implemented.");
         }
 
-        if (cb_velocity) {
-            YEET_DEBUG;
-            throw std::runtime_error("Central body velocity correction has not been implemented.");
-        }
+//        if (cb_velocity) {
+//            YEET_DEBUG;
+//            throw std::runtime_error("Central body velocity correction has not been implemented.");
+//        }
+
         if (cb_acceleration) {
             YEET_DEBUG;
             throw std::runtime_error("Central body acceleration correction has not been implemented.");

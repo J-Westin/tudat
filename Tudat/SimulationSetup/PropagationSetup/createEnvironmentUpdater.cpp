@@ -799,6 +799,13 @@ std::vector< std::string > > createEnvironmentUpdaterSettingsForDependentVariabl
     case radiation_pressure_coefficient_dependent_variable:
         variablesToUpdate[ radiation_pressure_interface_update ].push_back( dependentVariableSaveSettings->associatedBody_ );
         break;
+
+    case jw_acceleration_schwarzschild_dependent_variable:
+        break;
+
+    case jw_acceleration_components_dependent_variable:
+        break;
+
     default:
         throw std::runtime_error( "Error when getting environment updates for dependent variables, parameter " +
                                   std::to_string( dependentVariableSaveSettings->dependentVariableType_ ) + " not found." );

@@ -947,6 +947,57 @@ std::pair< std::function< Eigen::VectorXd( ) >, int > getVectorDependentVariable
         parameterSize = 3;
         break;
     }
+
+    case jw_acceleration_components_dependent_variable:
+        {
+            std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel< Eigen::Vector3d > > >
+                list_of_jw_accelerations =
+                    getAccelerationBetweenBodies(
+                        dependentVariableSettings->associatedBody_,
+                        dependentVariableSettings->secondaryBody_,
+                        stateDerivativeModels,
+                        basic_astrodynamics::jw_acceleration
+                    );
+
+            unsigned int n_jw_accelerations = list_of_jw_accelerations.size();
+
+            if ( n_jw_accelerations == 0 ) {
+                throw std::runtime_error (
+                    "Body " + dependentVariableSettings->secondaryBody_ +
+                    " does not exert jw_acceleration on body " + dependentVariableSettings->associatedBody_
+                );
+
+            } else if (n_jw_accelerations >= 2) {
+                throw std::runtime_error (
+                    "Body " + dependentVariableSettings->secondaryBody_ +
+                    " exerts too many (" + std::to_string(n_jw_accelerations) +
+                    ") jw_acceleration on body " + dependentVariableSettings->associatedBody_
+                );
+
+            } else {
+                std::shared_ptr< jw::jw_acceleration > jw_acceleration_model =
+                    std::dynamic_pointer_cast< jw::jw_acceleration > ( list_of_jw_accelerations[0] );
+
+                variableFunction = std::bind(
+                    &jw::jw_acceleration::get_acceleration_components,
+                    jw_acceleration_model
+                );
+
+                parameterSize = 6;
+
+//                std::function< Eigen::Vector3d( ) > vector_function =
+//                    std::bind(
+//                        &jw::jw_acceleration::get_schwarzschild_acceleration,
+//                        jw_acceleration_model
+//                    );
+//
+//                variableFunction = std::bind( &linear_algebra::getVectorNormFromFunction, vector_function );
+
+            }
+
+            break;
+        }
+
 #if( BUILD_WITH_ESTIMATION_TOOLS )
     case acceleration_partial_wrt_body_translational_state:
     {
@@ -1518,6 +1569,53 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                                             bodyMap.at( bodyWithProperty )->getRadiationPressureInterfaces( ).at( secondaryBody ) );
             break;
         }
+
+        case jw_acceleration_schwarzschild_dependent_variable:
+        {
+            std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel< Eigen::Vector3d > > >
+                list_of_jw_accelerations =
+                    getAccelerationBetweenBodies(
+                        dependentVariableSettings->associatedBody_,
+                        dependentVariableSettings->secondaryBody_,
+                        stateDerivativeModels,
+                        basic_astrodynamics::jw_acceleration
+                    );
+
+            unsigned int n_jw_accelerations = list_of_jw_accelerations.size();
+
+            if ( n_jw_accelerations == 0 ) {
+                throw std::runtime_error (
+                    "Body " + dependentVariableSettings->secondaryBody_ +
+                    " does not exert jw_acceleration on body " + dependentVariableSettings->associatedBody_
+                );
+
+            } else if (n_jw_accelerations >= 2) {
+                throw std::runtime_error (
+                    "Body " + dependentVariableSettings->secondaryBody_ +
+                    " exerts too many (" + std::to_string(n_jw_accelerations) +
+                    ") jw_acceleration on body " + dependentVariableSettings->associatedBody_
+                );
+
+            } else {
+                std::shared_ptr< jw::jw_acceleration > jw_acceleration_model =
+                    std::dynamic_pointer_cast< jw::jw_acceleration > ( list_of_jw_accelerations[0]
+                );
+
+                std::function< Eigen::Vector3d( ) > vector_function =
+                    std::bind(
+                        &jw::jw_acceleration::get_schwarzschild_acceleration,
+                        jw_acceleration_model
+                    );
+
+                variableFunction = std::bind( &linear_algebra::getVectorNormFromFunction, vector_function );
+
+            }
+
+            break;
+        }
+
+
+
         default:
             std::string errorMessage =
                     "Error, did not recognize double dependent variable type when making variable function: " +

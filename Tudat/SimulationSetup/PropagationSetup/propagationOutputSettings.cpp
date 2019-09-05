@@ -200,6 +200,15 @@ std::string getDependentVariableName( const PropagationDependentVariables propag
     case radiation_pressure_coefficient_dependent_variable:
         variableName = "Radiation pressure coefficient ";
         break;
+
+    case jw_acceleration_schwarzschild_dependent_variable:
+        variableName = "JW Schwarzschild acceleration ";
+        break;
+
+    case jw_acceleration_components_dependent_variable:
+        variableName = "JW acceleration components ";
+        break;
+
     default:
         std::string errorMessage = "Error, dependent variable " +
                 std::to_string( propagationDependentVariables ) +
