@@ -21,6 +21,7 @@ set(OBSERVATION_MODELS_SOURCES
   "${SRCROOT}${OBSERVATIONMODELSDIR}/observationModel.cpp"
   "${SRCROOT}${OBSERVATIONMODELSDIR}/simulateObservations.cpp"
   "${SRCROOT}${OBSERVABLECORRECTIONSDIR}/firstOrderRelativisticLightTimeCorrection.cpp"  
+  "${SRCROOT}${OBSERVABLECORRECTIONSDIR}/jw_lighttime_correction.cpp"  
 )
 
 # Set the header files.
@@ -46,6 +47,7 @@ set(OBSERVATION_MODELS_HEADERS
   "${SRCROOT}${OBSERVATIONMODELSDIR}/observationViabilityCalculator.h"
   "${SRCROOT}${OBSERVABLECORRECTIONSDIR}/lightTimeCorrection.h"
   "${SRCROOT}${OBSERVABLECORRECTIONSDIR}/firstOrderRelativisticLightTimeCorrection.h"
+  "${SRCROOT}${OBSERVABLECORRECTIONSDIR}/jw_lighttime_correction.h"
 )
 
 

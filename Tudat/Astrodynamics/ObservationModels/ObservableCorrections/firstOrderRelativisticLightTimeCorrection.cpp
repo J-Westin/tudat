@@ -39,12 +39,24 @@ double FirstOrderLightTimeCorrectionCalculator::calculateLightTimeCorrection(
     {
         evaluationTime = transmissionTime + lightTimeEvaluationContribution_.at( i ) * ( receptionTime - transmissionTime );
         // Calculate correction due to current body and add to total.
-        currentLighTimeCorrectionComponents_[ i ] = relativity::calculateFirstOrderLightTimeCorrectionFromCentralBody(
+        currentLighTimeCorrectionComponents_[ i ] =
+//            relativity::calculate_velocity_lighttime (
+//                perturbingBodyGravitationalParameterFunctions_[ i ]( ),
+//                transmitterState.segment( 0, 3 ), receiverState.segment( 0, 3 ),
+//                perturbingBodyStateFunctions_[ i ]( evaluationTime ),
+//                ppnParameterGamma
+//            );
+
+            relativity::calculateFirstOrderLightTimeCorrectionFromCentralBody(
                     perturbingBodyGravitationalParameterFunctions_[ i ]( ),
                     transmitterState.segment( 0, 3 ), receiverState.segment( 0, 3 ),
                     perturbingBodyStateFunctions_[ i ]( evaluationTime ).segment( 0, 3 ),
                     ppnParameterGamma );
+
+
+
         currentTotalLightTimeCorrection_ += currentLighTimeCorrectionComponents_[ i ];
+
     }
 
     return currentTotalLightTimeCorrection_;

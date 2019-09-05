@@ -65,6 +65,15 @@ Eigen::Matrix< double, 1, 3 > calculateFirstOrderCentralBodyLightTimeCorrectionG
         const bool evaluateGradientAtReceiver,
         const double ppnParameterGamma = 1.0 );
 
+
+double calculate_velocity_lighttime(
+    double mu,
+    Eigen::Vector3d x_t, // Transmitter position
+    Eigen::Vector3d x_r, // Receiver position
+    Eigen::Vector6d s_p, // Central body state
+    double gamma_ppn
+);
+
 } // namespace relativity
 
 } // namespace tudat

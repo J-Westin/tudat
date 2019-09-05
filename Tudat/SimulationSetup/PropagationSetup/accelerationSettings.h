@@ -21,7 +21,15 @@
 #include "Tudat/Astrodynamics/Aerodynamics/aerodynamicAcceleration.h"
 #include "Tudat/Astrodynamics/BasicAstrodynamics/accelerationModelTypes.h"
 #include "Tudat/SimulationSetup/PropagationSetup/createThrustModelGuidance.h"
+
 // #include "Tudat/Mathematics/Interpolators/createInterpolator.h"
+
+#ifndef YEET_DEBUG
+
+    #define YEET_DEBUG std::cout << __FILE__ << std::endl;\
+        std::cout << __LINE__ << std::endl
+
+#endif // YEET_DEBUG
 
 namespace tudat
 {
@@ -539,6 +547,86 @@ public:
 
 };
 
+
+class jw_acceleration_settings: public AccelerationSettings {
+public:
+    // ~ Attributes ~ //
+    bool newton, kinetic, schwarzschild, de_sitter, cb_velocity, cb_acceleration;
+
+    std::string primary_name;
+
+    Eigen::Vector3d cb_angular_momentum;
+
+
+    // ~ Constructor ~ //
+    jw_acceleration_settings (
+        const bool newton = false,
+        const bool kinetic = false,
+        const bool schwarzschild = false,
+        const bool de_sitter = false,
+        const bool cb_velocity = false,
+        const bool cb_acceleration = false,
+        const std::string primary_name = "",
+        const Eigen::Vector3d centralBodyAngularMomentum = Eigen::Vector3d::Zero( )
+
+    ) : AccelerationSettings( basic_astrodynamics::jw_acceleration ),
+        newton(newton),
+        kinetic(kinetic),
+        schwarzschild(schwarzschild),
+        de_sitter(de_sitter),
+        cb_velocity(cb_velocity),
+        cb_acceleration(cb_acceleration) { }
+
+    void check_validity() {
+        if (newton) {
+            YEET_DEBUG;
+            throw std::runtime_error("Newtonian acceleration has not been implemented.");
+        }
+
+        if (kinetic) {
+            YEET_DEBUG;
+            throw std::runtime_error("Kinetic correction term has not been implemented.");
+        }
+
+        if (schwarzschild) {
+            YEET_DEBUG;
+            throw std::runtime_error("Schwarzschild acceleration has not been implemented.");
+        }
+
+        if (de_sitter) {
+            YEET_DEBUG;
+            throw std::runtime_error("De Sitter correction has not been implemented.");
+        }
+
+        if (cb_velocity) {
+            YEET_DEBUG;
+            throw std::runtime_error("Central body velocity correction has not been implemented.");
+        }
+        if (cb_acceleration) {
+            YEET_DEBUG;
+            throw std::runtime_error("Central body acceleration correction has not been implemented.");
+        }
+
+        if (de_sitter && (primary_name == "")) {
+            YEET_DEBUG;
+            throw std::runtime_error("De Sitter acceleration cannot be computed without a primary body.");
+        }
+
+        return;
+    }
+
+//    void set_newton         (const bool flg) { newton          = flg; }
+//    void set_kinetic        (const bool flg) { kinetic         = flg; }
+//    void set_schwarzschild  (const bool flg) { schwarzschild   = flg; }
+//    void set_de_sitter      (const bool flg) { de_sitter       = flg; }
+//    void set_cb_velocity    (const bool flg) { cb_velocity     = flg; }
+//    void set_cb_acceleration(const bool flg) { cb_acceleration = flg; }
+
+//    void set_primary_name (const std::string prm_name) { primary_name = prm_name; }
+
+};
+
+
 //! Typedef defining a list of acceleration settings, set up in the same manner as the
 //! AccelerationMap typedef.
 typedef std::map< std::string, std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > >
@@ -550,5 +638,7 @@ SelectedAccelerationList;
 } // namespace simulation_setup
 
 } // namespace tudat
+
+#undef YEET_DEBUG
 
 #endif // TUDAT_ACCELERATIONSETTINGS_H

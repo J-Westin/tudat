@@ -11,6 +11,7 @@
 #include "Tudat/SimulationSetup/EnvironmentSetup/body.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createLightTimeCorrection.h"
 #include "Tudat/Astrodynamics/ObservationModels/ObservableCorrections/firstOrderRelativisticLightTimeCorrection.h"
+#include "Tudat/Astrodynamics/ObservationModels/ObservableCorrections/jw_lighttime_correction.h"
 #include "Tudat/Astrodynamics/Relativity/metric.h"
 
 namespace tudat
@@ -87,6 +88,49 @@ std::shared_ptr< LightTimeCorrection > createLightTimeCorrections(
 
         break;
     }
+
+    case jw_lighttime:
+
+        if (std::dynamic_pointer_cast<jw_lighttime_settings>(correctionSettings) != nullptr) {
+
+            // Retrieve list of bodies causing light time perturbation
+            std::vector< std::string > perturbingBodies =
+                    std::dynamic_pointer_cast< jw_lighttime_settings >( correctionSettings )->get_perturbing_bodies( );
+
+            std::vector< std::function< Eigen::Vector6d( const double ) > > perturbingBodyStateFunctions;
+            std::vector< std::function< double( ) > > perturbingBodyGravitationalParameterFunctions;
+
+            // Retrieve mass and state functions for each perturbing body.
+            for( unsigned int i = 0; i < perturbingBodies.size( ); i++ ) {
+                if( bodyMap.count( perturbingBodies[ i ] ) == 0 ) {
+                    throw std::runtime_error(
+                                "Error when making jw light time correction, could not find body " +
+                                perturbingBodies.at( i ) );
+                } else {
+                    // Set state function.
+                    perturbingBodyStateFunctions.push_back(
+                                std::bind( &simulation_setup::Body::getStateInBaseFrameFromEphemeris< double, double >,
+                                                                         bodyMap.at( perturbingBodies[ i ] ), std::placeholders::_1 ) );
+
+                    // Set gravitational parameter function.
+                    perturbingBodyGravitationalParameterFunctions.push_back(
+                                std::bind( &gravitation::GravityFieldModel::getGravitationalParameter,
+                                             bodyMap.at( perturbingBodies[ i ] )->
+                                             getGravityFieldModel( ) ) );
+                }
+            }
+
+            // Create light-time correction function
+            lightTimeCorrection = std::make_shared< jw_lighttime_calculator >(
+                        perturbingBodyStateFunctions, perturbingBodyGravitationalParameterFunctions, perturbingBodies,
+                        transmitter.first, receiver.first,
+                        std::bind( &relativity::PPNParameterSet::getParameterGamma, relativity::ppnParameterSet ) );
+        } else {
+            throw std::runtime_error(
+                        "Error, correction settings type (jw_lighttime) does not coincide with data type." );
+        }
+        break;
+
     default:
     {
         std::string errorMessage = "Error, light time correction type " +

@@ -71,6 +71,11 @@ std::string getAccelerationModelName( const AvailableAcceleration accelerationTy
     case solar_sail_acceleration:
         accelerationName = "solar sail acceleration";
         break;
+
+    case jw_acceleration:
+        accelerationName = "jw acceleration";
+        break;
+
     default:
         std::string errorMessage = "Error, acceleration type " +
                 std::to_string( accelerationType ) +

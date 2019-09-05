@@ -1293,8 +1293,27 @@ std::shared_ptr< jw::jw_acceleration >
         const std::shared_ptr< Body > body_subject,
         const std::shared_ptr< Body > body_actor,
         const std::string& name_subject,
-        const std::string& name_actor
+        const std::string& name_actor,
+        const std::shared_ptr< AccelerationSettings > acceleration_settings
     ) {
+
+    std::shared_ptr< jw_acceleration_settings > jw_settings =
+        std::dynamic_pointer_cast< jw_acceleration_settings > (
+            acceleration_settings
+        );
+
+    if( jw_settings == nullptr ) {
+        throw std::runtime_error(
+            "Error, expected jw acceleration settings when making acceleration model on " +
+            name_subject + " due to " + name_actor
+        );
+    }
+
+//    if ( std::dynamic_pointer_cast< simulation_setup::jw_acceleration_settings > (acceleration_settings) == nullptr ) {
+//        std::cout << __FILE__ << std::endl;
+//        std::cout << __LINE__ << std::endl;
+//        throw std::runtime_error("When creating jw_acceleration object, acceleration settings were not of type jw_acceleration_settings.");
+//    }
 
     std::function< Eigen::Vector6d() > state_function_subject =
         std::bind( &Body::getState, body_subject );
@@ -1308,7 +1327,9 @@ std::shared_ptr< jw::jw_acceleration >
     return std::make_shared< jw::jw_acceleration > (
         state_function_subject,
         state_function_actor,
-        mu_function_actor
+        mu_function_actor,
+        jw_settings->newton,
+        jw_settings->schwarzschild
     );
 }
 
@@ -1427,7 +1448,8 @@ std::shared_ptr< AccelerationModel< Eigen::Vector3d > > createAccelerationModel(
             bodyUndergoingAcceleration,
             bodyExertingAcceleration,
             nameOfBodyUndergoingAcceleration,
-            nameOfBodyExertingAcceleration
+            nameOfBodyExertingAcceleration,
+            accelerationSettings
         );
         break;
 

@@ -15,6 +15,7 @@ set(RELATIVITY_SOURCES
   "${SRCROOT}${RELATIVITYDIR}/relativisticTimeConversion.cpp"
   "${SRCROOT}${RELATIVITYDIR}/metric.cpp"
   "${SRCROOT}${RELATIVITYDIR}/jw_acceleration.cpp"
+  "${SRCROOT}${RELATIVITYDIR}/jw_lighttime.cpp"
 )
 
 # Set the header files.
@@ -24,6 +25,7 @@ set(RELATIVITY_HEADERS
   "${SRCROOT}${RELATIVITYDIR}/relativisticTimeConversion.h"
   "${SRCROOT}${RELATIVITYDIR}/metric.h"
   "${SRCROOT}${RELATIVITYDIR}/jw_acceleration.h"
+  "${SRCROOT}${RELATIVITYDIR}/jw_lighttime.h"
 )
 
 # Add static libraries.

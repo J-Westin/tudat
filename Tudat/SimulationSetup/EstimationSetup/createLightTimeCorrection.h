@@ -102,6 +102,26 @@ private:
 
 };
 
+
+class jw_lighttime_settings: public LightTimeCorrectionSettings {
+private:
+    std::vector <std::string> perturbing_bodies;
+
+public:
+    jw_lighttime_settings(const std::vector<std::string>& perturbing_bodies)
+    : LightTimeCorrectionSettings(jw_lighttime),
+      perturbing_bodies(perturbing_bodies) {
+
+    }
+
+    ~jw_lighttime_settings() {}
+
+    std::vector <std::string> get_perturbing_bodies() {
+        return perturbing_bodies;
+    }
+};
+
+
 //! Function to create object that computes a single (type of) correction to the light-time
 /*!
  * Function to create object that computes a single (type of) correction to the light-time

@@ -442,7 +442,8 @@ std::shared_ptr< jw::jw_acceleration >
         const std::shared_ptr< Body > body_subject,
         const std::shared_ptr< Body > body_actor,
         const std::string& name_subject,
-        const std::string& name_actor
+        const std::string& name_actor,
+        const std::shared_ptr< AccelerationSettings > acceleration_settings
     );
 
 
