@@ -1311,12 +1311,6 @@ std::shared_ptr< jw::jw_acceleration >
 
     jw_settings->check_validity();
 
-//    if ( std::dynamic_pointer_cast< simulation_setup::jw_acceleration_settings > (acceleration_settings) == nullptr ) {
-//        std::cout << __FILE__ << std::endl;
-//        std::cout << __LINE__ << std::endl;
-//        throw std::runtime_error("When creating jw_acceleration object, acceleration settings were not of type jw_acceleration_settings.");
-//    }
-
     std::function< Eigen::Vector6d() > state_function_subject =
         std::bind( &Body::getState, body_subject );
 
@@ -1326,17 +1320,51 @@ std::shared_ptr< jw::jw_acceleration >
     std::function< double() > mu_function_actor =
         std::bind( &GravityFieldModel::getGravitationalParameter, body_actor->getGravityFieldModel() );
 
-    return std::make_shared< jw::jw_acceleration > (
-        state_function_subject,
-        state_function_actor,
-        mu_function_actor,
-        jw_settings->newton,
-        jw_settings->kinetic,
-        jw_settings->schwarzschild,
-        jw_settings->de_sitter,
-        jw_settings->cb_velocity,
-        jw_settings->cb_acceleration
-    );
+    if ( !(jw_settings->de_sitter) ) {
+
+        return std::make_shared< jw::jw_acceleration > (
+            state_function_subject,
+            state_function_actor,
+            mu_function_actor,
+            jw_settings->angular_momentum_actor,
+            jw_settings->newton,
+            jw_settings->kinetic,
+            jw_settings->schwarzschild,
+            jw_settings->de_sitter,
+            jw_settings->cb_velocity,
+            jw_settings->cb_acceleration,
+            jw_settings->lense_thirring,
+            jw_settings->wavi
+        );
+
+    } else {
+
+        std::shared_ptr< Body > body_primary = jw_settings->primary_body_ptr;
+
+        std::function< Eigen::Vector6d() > state_function_primary =
+            std::bind( &Body::getState, body_primary );
+
+        std::function< double() > mu_function_primary =
+            std::bind( &GravityFieldModel::getGravitationalParameter, body_primary->getGravityFieldModel() );
+
+        return std::make_shared< jw::jw_acceleration > (
+            state_function_subject,
+            state_function_actor,
+            state_function_primary,
+            mu_function_actor,
+            mu_function_primary,
+            jw_settings->angular_momentum_actor,
+            jw_settings->newton,
+            jw_settings->kinetic,
+            jw_settings->schwarzschild,
+            jw_settings->de_sitter,
+            jw_settings->cb_velocity,
+            jw_settings->cb_acceleration,
+            jw_settings->lense_thirring,
+            jw_settings->wavi
+        );
+
+    }
 }
 
 //! Function to create acceleration model object.

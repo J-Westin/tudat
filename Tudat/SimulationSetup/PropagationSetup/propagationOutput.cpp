@@ -351,7 +351,7 @@ int getDependentVariableSize(
         break;
 
     case jw_acceleration_components_dependent_variable:
-        variableSize = 6; // newton, kinetic, schwarzschild, desitter, velocity, acceleration
+        variableSize = 8; // newton, kinetic, schwarzschild, desitter, velocity, acceleration, lense thirring, wavi
         break;
 
     default:

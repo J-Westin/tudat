@@ -551,11 +551,13 @@ public:
 class jw_acceleration_settings: public AccelerationSettings {
 public:
     // ~ Attributes ~ //
-    bool newton, kinetic, schwarzschild, de_sitter, cb_velocity, cb_acceleration;
+    bool newton, kinetic, schwarzschild, de_sitter, cb_velocity, cb_acceleration, lense_thirring, wavi;
 
     std::string primary_name;
 
-    Eigen::Vector3d cb_angular_momentum;
+    Eigen::Vector3d angular_momentum_actor;
+
+    std::shared_ptr<tudat::simulation_setup::Body> primary_body_ptr;
 
     // ~ Constructor ~ //
     jw_acceleration_settings (
@@ -565,6 +567,8 @@ public:
         const bool de_sitter = false,
         const bool cb_velocity = false,
         const bool cb_acceleration = false,
+        const bool lense_thirring = false,
+        const bool wavi = false,
         const std::string primary_name = "",
         const Eigen::Vector3d centralBodyAngularMomentum = Eigen::Vector3d::Zero( )
 
@@ -574,7 +578,11 @@ public:
         schwarzschild(schwarzschild),
         de_sitter(de_sitter),
         cb_velocity(cb_velocity),
-        cb_acceleration(cb_acceleration) { }
+        cb_acceleration(cb_acceleration),
+        lense_thirring(lense_thirring),
+        wavi(wavi),
+        primary_name(primary_name),
+        angular_momentum_actor(Eigen::Vector3d::Zero( ) ) { }
 
     void check_validity() {
         if (newton) {
@@ -582,20 +590,20 @@ public:
             throw std::runtime_error("Newtonian acceleration has not been implemented.");
         }
 
-        if (kinetic) {
-            YEET_DEBUG;
-            throw std::runtime_error("Kinetic correction term has not been implemented.");
-        }
+//        if (kinetic) {
+//            YEET_DEBUG;
+//            throw std::runtime_error("Kinetic correction term has not been implemented.");
+//        }
 
 //        if (schwarzschild) {
 //            YEET_DEBUG;
 //            throw std::runtime_error("Schwarzschild acceleration has not been implemented.");
 //        }
 
-        if (de_sitter) {
-            YEET_DEBUG;
-            throw std::runtime_error("De Sitter correction has not been implemented.");
-        }
+//        if (de_sitter) {
+//            YEET_DEBUG;
+//            throw std::runtime_error("De Sitter correction has not been implemented.");
+//        }
 
 //        if (cb_velocity) {
 //            YEET_DEBUG;
@@ -607,6 +615,16 @@ public:
             throw std::runtime_error("Central body acceleration correction has not been implemented.");
         }
 
+//        if (lense_thirring) {
+//            YEET_DEBUG;
+//            throw std::runtime_error("Lense-Thirring correction has not been implemented.");
+//        }
+
+        if (lense_thirring && angular_momentum_actor == Eigen::Vector3d::Zero() ) {
+            YEET_DEBUG;
+            std::cout << "Warning: Lense Thirring to be calculated with central body angular momentum of zero." << std::endl;
+        }
+
         if (de_sitter && (primary_name == "")) {
             YEET_DEBUG;
             throw std::runtime_error("De Sitter acceleration cannot be computed without a primary body.");
@@ -614,16 +632,6 @@ public:
 
         return;
     }
-
-//    void set_newton         (const bool flg) { newton          = flg; }
-//    void set_kinetic        (const bool flg) { kinetic         = flg; }
-//    void set_schwarzschild  (const bool flg) { schwarzschild   = flg; }
-//    void set_de_sitter      (const bool flg) { de_sitter       = flg; }
-//    void set_cb_velocity    (const bool flg) { cb_velocity     = flg; }
-//    void set_cb_acceleration(const bool flg) { cb_acceleration = flg; }
-
-//    void set_primary_name (const std::string prm_name) { primary_name = prm_name; }
-
 };
 
 

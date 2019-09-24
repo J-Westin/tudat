@@ -983,16 +983,7 @@ std::pair< std::function< Eigen::VectorXd( ) >, int > getVectorDependentVariable
                     jw_acceleration_model
                 );
 
-                parameterSize = 6;
-
-//                std::function< Eigen::Vector3d( ) > vector_function =
-//                    std::bind(
-//                        &jw::jw_acceleration::get_schwarzschild_acceleration,
-//                        jw_acceleration_model
-//                    );
-//
-//                variableFunction = std::bind( &linear_algebra::getVectorNormFromFunction, vector_function );
-
+                parameterSize = 8;
             }
 
             break;
