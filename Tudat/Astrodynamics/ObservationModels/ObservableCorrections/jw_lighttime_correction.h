@@ -28,6 +28,10 @@ namespace observation_models {
         //! Names of bodies causing light-time correction.
         std::vector< std::string > perturbingBodyNames_;
 
+        bool shapiro_flag, second_order_flag,
+             velocity_flag, j2_flag;
+
+
         //! Function returning the parametric post-Newtonian parameter gamma
         /*!
          *  Function returning the parametric post-Newtonian parameter gamma, a measure for the space-time curvature due to a
@@ -60,38 +64,47 @@ namespace observation_models {
          *  for the space-time curvature due to a unit rest mass (default 1.0; value from GR)
          */
         jw_lighttime_calculator(
-                const std::vector< std::function< Eigen::Vector6d( const double ) > >& perturbingBodyStateFunctions,
-                const std::vector< std::function< double( ) > >& perturbingBodyGravitationalParameterFunctions,
-                const std::vector< std::string > perturbingBodyNames,
-                const std::string transmittingBody,
-                const std::string receivingBody,
-                const std::function< double( ) >& ppnParameterGammaFunction = [ ]( ){ return 1.0; } ):
-            LightTimeCorrection( first_order_relativistic ),
-            perturbingBodyStateFunctions_( perturbingBodyStateFunctions ),
-            perturbingBodyGravitationalParameterFunctions_( perturbingBodyGravitationalParameterFunctions ),
-            perturbingBodyNames_( perturbingBodyNames ),
-            ppnParameterGammaFunction_( ppnParameterGammaFunction )
-        {
-            currentTotalLightTimeCorrection_ = 0.0;
-            currentLighTimeCorrectionComponents_.resize( perturbingBodyNames_.size( ) );
+            const std::vector< std::function< Eigen::Vector6d( const double ) > >& perturbingBodyStateFunctions,
+            const std::vector< std::function< double( ) > >& perturbingBodyGravitationalParameterFunctions,
+            const std::vector< std::string > perturbingBodyNames,
+            const std::string transmittingBody,
+            const std::string receivingBody,
+            const bool shapiro,
+            const bool second_order,
+            const bool velocity,
+            const bool j2,
+            const std::function< double( ) >& ppnParameterGammaFunction = [ ]( ){ return 1.0; } )
 
-            // Check if perturbing body is transmitting/receiving body, and set evaluation time settings accordingly
-            for( unsigned int i = 0; i < perturbingBodyNames.size( ); i++ )
-            {
-                if( perturbingBodyNames.at( i ) == transmittingBody )
-                {
-                    lightTimeEvaluationContribution_.push_back( 0.0 );
+             :  LightTimeCorrection( first_order_relativistic ),
+                perturbingBodyStateFunctions_( perturbingBodyStateFunctions ),
+                perturbingBodyGravitationalParameterFunctions_( perturbingBodyGravitationalParameterFunctions ),
+                perturbingBodyNames_( perturbingBodyNames ),
+                shapiro_flag(shapiro),
+                second_order_flag(second_order),
+                velocity_flag(velocity),
+                j2_flag(j2),
+                ppnParameterGammaFunction_( ppnParameterGammaFunction ) {
+
+                    currentTotalLightTimeCorrection_ = 0.0;
+                    currentLighTimeCorrectionComponents_.resize( perturbingBodyNames_.size( ) );
+
+                    // Check if perturbing body is transmitting/receiving body, and set evaluation time settings accordingly
+                    for( unsigned int i = 0; i < perturbingBodyNames.size( ); i++ )
+                    {
+                        if( perturbingBodyNames.at( i ) == transmittingBody )
+                        {
+                            lightTimeEvaluationContribution_.push_back( 0.0 );
+                        }
+                        else if( perturbingBodyNames.at( i ) == receivingBody )
+                        {
+                            lightTimeEvaluationContribution_.push_back( 1.0 );
+                        }
+                        else
+                        {
+                            lightTimeEvaluationContribution_.push_back( 0.5 );
+                        }
+                    }
                 }
-                else if( perturbingBodyNames.at( i ) == receivingBody )
-                {
-                    lightTimeEvaluationContribution_.push_back( 1.0 );
-                }
-                else
-                {
-                    lightTimeEvaluationContribution_.push_back( 0.5 );
-                }
-            }
-        }
 
         //! Destructor
         ~jw_lighttime_calculator( ){ }
@@ -108,10 +121,12 @@ namespace observation_models {
          *  \return Total light time correction due to gravitating masses defined by perturbingBodyStateFunctions_ and
          *  perturbingBodyGravitationalParameterFunctions_ member variables.
          */
-        double calculateLightTimeCorrection( const Eigen::Vector6d& transmitterState,
-                                             const Eigen::Vector6d& receiverState,
-                                             const double transmissionTime,
-                                             const double receptionTime );
+        double calculateLightTimeCorrection(
+            const Eigen::Vector6d& transmitterState,
+            const Eigen::Vector6d& receiverState,
+            const double transmissionTime,
+            const double receptionTime
+        );
 
         //! Function to compute the partial derivative of the light-time correction w.r.t. observation time
         /*!
@@ -150,63 +165,38 @@ namespace observation_models {
          * \return Light-time correction w.r.t. link end position
          */
         Eigen::Matrix< double, 3, 1 > calculateLightTimeCorrectionPartialDerivativeWrtLinkEndPosition(
-                const Eigen::Vector6d& transmitterState,
-                const Eigen::Vector6d& receiverState,
-                const double transmissionTime,
-                const double receptionTime,
-                const LinkEndType linkEndAtWhichPartialIsEvaluated );
+            const Eigen::Vector6d& transmitterState,
+            const Eigen::Vector6d& receiverState,
+            const double transmissionTime,
+            const double receptionTime,
+            const LinkEndType linkEndAtWhichPartialIsEvaluated
+        ) {
+            throw std::runtime_error("jw lighttime derivative wrt time has not been implemented");
 
-        //! Function to get the names of bodies causing light-time correction.
-        /*!
-         * Function to get the names of bodies causing light-time correction.
-         * \return Names of bodies causing light-time correction.
-         */
-        std::vector< std::string > getPerturbingBodyNames( )
-        {
+            Eigen::Matrix< double, 3, 1 > ret;
+            ret.setZero();
+            return ret;
+        }
+
+
+
+        std::vector< std::string > getPerturbingBodyNames( ) {
             return perturbingBodyNames_;
         }
 
-        //! Function to get the set of functions returning the gravitational parameters of the gravitating bodies.
-        /*!
-         * Function to get the set of functions returning the gravitational parameters of the gravitating bodies.
-         * \return Set of functions returning the gravitational parameters of the gravitating bodies.
-         */
-        std::vector< std::function< double( ) > > getPerturbingBodyGravitationalParameterFunctions( )
-        {
+        std::vector< std::function< double( ) > > getPerturbingBodyGravitationalParameterFunctions( ) {
             return perturbingBodyGravitationalParameterFunctions_;
         }
 
-        //! Function to get the total light-time correction, as computed by last call to calculateLightTimeCorrection.
-        /*!
-         * Function to get the total light-time correction, as computed by last call to calculateLightTimeCorrection.
-         * \return Total light-time correction, as computed by last call to calculateLightTimeCorrection.
-         */
-        double getCurrentTotalLightTimeCorrection( )
-        {
+        double getCurrentTotalLightTimeCorrection( ) {
             return currentTotalLightTimeCorrection_;
         }
 
-        //! Function to get the light-time correction of given perturbing body, as computed by last call to
-        //! calculateLightTimeCorrection.
-        /*!
-         * Function to get the light-time correction of given perturbing body, as computed by last call to
-         * calculateLightTimeCorrection.
-         * \param bodyIndex Index in list of bodies for which the correction is to be returbed
-         * \return Light-time correction of given perturbing body, as computed by last call to
-         * calculateLightTimeCorrection.
-         */
-        double getCurrentLightTimeCorrectionComponent( const int bodyIndex )
-        {
+        double getCurrentLightTimeCorrectionComponent( const int bodyIndex ) {
             return currentLighTimeCorrectionComponents_.at( bodyIndex );
         }
 
-        //! Function to get the function returning the parametric post-Newtonian parameter gamma
-        /*!
-         * Function to get the function returning the parametric post-Newtonian parameter gamma
-         * \return Function returning the parametric post-Newtonian parameter gamma
-         */
-        std::function< double( ) > getPpnParameterGammaFunction_( )
-        {
+        std::function< double( ) > getPpnParameterGammaFunction_( ) {
             return ppnParameterGammaFunction_;
         }
     };

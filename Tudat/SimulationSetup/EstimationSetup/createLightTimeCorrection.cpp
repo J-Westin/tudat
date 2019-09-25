@@ -89,13 +89,16 @@ std::shared_ptr< LightTimeCorrection > createLightTimeCorrections(
         break;
     }
 
-    case jw_lighttime:
+    case jw_lighttime: {
 
-        if (std::dynamic_pointer_cast<jw_lighttime_settings>(correctionSettings) != nullptr) {
+        std::shared_ptr<jw_lighttime_settings> jw_settings =
+            std::dynamic_pointer_cast<jw_lighttime_settings>(correctionSettings);
+
+        if (jw_settings != nullptr) {
 
             // Retrieve list of bodies causing light time perturbation
             std::vector< std::string > perturbingBodies =
-                    std::dynamic_pointer_cast< jw_lighttime_settings >( correctionSettings )->get_perturbing_bodies( );
+                jw_settings->get_perturbing_bodies( );
 
             std::vector< std::function< Eigen::Vector6d( const double ) > > perturbingBodyStateFunctions;
             std::vector< std::function< double( ) > > perturbingBodyGravitationalParameterFunctions;
@@ -122,14 +125,21 @@ std::shared_ptr< LightTimeCorrection > createLightTimeCorrections(
 
             // Create light-time correction function
             lightTimeCorrection = std::make_shared< jw_lighttime_calculator >(
-                        perturbingBodyStateFunctions, perturbingBodyGravitationalParameterFunctions, perturbingBodies,
-                        transmitter.first, receiver.first,
-                        std::bind( &relativity::PPNParameterSet::getParameterGamma, relativity::ppnParameterSet ) );
-        } else {
-            throw std::runtime_error(
-                        "Error, correction settings type (jw_lighttime) does not coincide with data type." );
+                perturbingBodyStateFunctions, perturbingBodyGravitationalParameterFunctions, perturbingBodies,
+                transmitter.first, receiver.first,
+                jw_settings->shapiro, jw_settings->second_order,
+                jw_settings->velocity, jw_settings->j2,
+                std::bind( &relativity::PPNParameterSet::getParameterGamma, relativity::ppnParameterSet ) );
         }
+
+        else {
+            throw std::runtime_error(
+                "Error, correction settings type (jw_lighttime) does not coincide with data type." );
+        }
+
         break;
+
+    }
 
     default:
     {

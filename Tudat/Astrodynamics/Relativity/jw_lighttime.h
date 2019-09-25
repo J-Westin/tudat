@@ -47,12 +47,13 @@ namespace jw {
      *  \return Light time correction (in seconds) due to the gravitating point mass.
      */
     Eigen::Matrix< double, 1, 3 > calculate_jw_lighttime_gradient(
-            const double bodyGravitationalParameter,
-            const Eigen::Vector3d& transmitterPosition,
-            const Eigen::Vector3d& receiverPosition,
-            const Eigen::Vector3d& centralBodyPosition,
-            const bool evaluateGradientAtReceiver,
-            const double ppnParameterGamma = 1.0 );
+        const double bodyGravitationalParameter,
+        const Eigen::Vector3d& transmitterPosition,
+        const Eigen::Vector3d& receiverPosition,
+        const Eigen::Vector3d& centralBodyPosition,
+        const bool evaluateGradientAtReceiver,
+        const double ppnParameterGamma = 1.0
+    );
 
 
 

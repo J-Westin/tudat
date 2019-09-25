@@ -103,22 +103,42 @@ private:
 };
 
 
+// ~~ JW Lighttime Correction Settings ~~ //
+
+//enum jw_lighttime_critical_time_settings{
+//    use_critical_time,
+//    use_tx_time,
+//    use_rx_time
+//};
+
 class jw_lighttime_settings: public LightTimeCorrectionSettings {
 private:
     std::vector <std::string> perturbing_bodies;
 
 public:
-    jw_lighttime_settings(const std::vector<std::string>& perturbing_bodies)
-    : LightTimeCorrectionSettings(jw_lighttime),
-      perturbing_bodies(perturbing_bodies) {
 
-    }
+    bool shapiro, second_order,
+         velocity, j2;
+
+    jw_lighttime_settings(const std::vector<std::string>& perturbing_bodies)
+      : LightTimeCorrectionSettings(jw_lighttime),
+        perturbing_bodies(perturbing_bodies),
+        shapiro(true),
+        second_order(false),
+        velocity(false),
+        j2(false) { }
 
     ~jw_lighttime_settings() {}
 
     std::vector <std::string> get_perturbing_bodies() {
         return perturbing_bodies;
     }
+
+    void set_shapiro      (const bool flag) { shapiro = flag;      }
+    void set_second_order (const bool flag) { second_order = flag; }
+    void set_velocity     (const bool flag) { velocity = flag;     }
+    void set_j2           (const bool flag) { j2 = flag;           }
+
 };
 
 
