@@ -38,21 +38,6 @@ namespace observation_models {
         return currentTotalLightTimeCorrection_;
     }
 
-    //! Function to compute the partial derivative of the light-time correction w.r.t. link end position
-    Eigen::Matrix< double, 3, 1 > jw_lighttime_calculator::
-    calculateLightTimeCorrectionPartialDerivativeWrtLinkEndPosition(
-            const Eigen::Vector6d& transmitterState,
-            const Eigen::Vector6d& receiverState,
-            const double transmissionTime,
-            const double receptionTime,
-            const LinkEndType linkEndAtWhichPartialIsEvaluated )
-    {
-        throw std::runtime_error("jw_lighttime gradient not implemented");
-        Eigen::Matrix<double, 3, 1> zero_vector;
-        zero_vector.setZero();
-        return zero_vector;
-    }
-
 
 
 } // namespace observation_models
