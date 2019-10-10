@@ -363,7 +363,7 @@ public:
                             "; current light-time corrections are: "  +
                             std::to_string( currentCorrection_ ) + " and input time was " +
                             std::to_string( static_cast< double >( time ) );
-                   std::cerr << errorMessage << std::endl;
+                   //std::cerr << errorMessage << std::endl;
                 }
 
                 // Update light time for new iteration.

@@ -105,23 +105,21 @@ private:
 
 // ~~ JW Lighttime Correction Settings ~~ //
 
-//enum jw_lighttime_critical_time_settings{
-//    use_critical_time,
-//    use_tx_time,
-//    use_rx_time
-//};
-
 class jw_lighttime_settings: public LightTimeCorrectionSettings {
 private:
-    std::vector <std::string> perturbing_bodies;
 
 public:
+    std::vector <std::string> perturbing_bodies;
+    std::vector <double> j2_coefficients;
+    std::vector <Eigen::Vector3d> orientation_axes;
 
     bool shapiro, second_order,
          velocity, j2;
 
-    jw_lighttime_settings(const std::vector<std::string>& perturbing_bodies)
-      : LightTimeCorrectionSettings(jw_lighttime),
+    jw_lighttime_settings(
+        const std::vector<std::string>& perturbing_bodies
+    ) :
+        LightTimeCorrectionSettings(jw_lighttime),
         perturbing_bodies(perturbing_bodies),
         shapiro(true),
         second_order(false),

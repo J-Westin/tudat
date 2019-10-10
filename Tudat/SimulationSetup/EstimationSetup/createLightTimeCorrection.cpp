@@ -14,6 +14,10 @@
 #include "Tudat/Astrodynamics/ObservationModels/ObservableCorrections/jw_lighttime_correction.h"
 #include "Tudat/Astrodynamics/Relativity/metric.h"
 
+#ifndef YEET_DEBUG
+    #define YEET_DEBUG std::cout << __FILE__ << "\nLine: " << __LINE__ << std::endl
+#endif // YEET_DEBUG
+
 namespace tudat
 {
 
@@ -96,12 +100,24 @@ std::shared_ptr< LightTimeCorrection > createLightTimeCorrections(
 
         if (jw_settings != nullptr) {
 
+
+
             // Retrieve list of bodies causing light time perturbation
             std::vector< std::string > perturbingBodies =
                 jw_settings->get_perturbing_bodies( );
 
+            if (jw_settings->j2) {
+                if (jw_settings->orientation_axes.size() != perturbingBodies.size()) {
+                    throw std::runtime_error("Number or supplied orientation axes does not match number of bodies");
+                }
+                if (jw_settings->j2_coefficients.size() != perturbingBodies.size()) {
+                    throw std::runtime_error("Number or supplied J2 coefficients does not match number of bodies");
+                }
+            }
+
             std::vector< std::function< Eigen::Vector6d( const double ) > > perturbingBodyStateFunctions;
             std::vector< std::function< double( ) > > perturbingBodyGravitationalParameterFunctions;
+            std::vector< Eigen::Vector3d > unit_orientation_axes;
 
             // Retrieve mass and state functions for each perturbing body.
             for( unsigned int i = 0; i < perturbingBodies.size( ); i++ ) {
@@ -112,23 +128,41 @@ std::shared_ptr< LightTimeCorrection > createLightTimeCorrections(
                 } else {
                     // Set state function.
                     perturbingBodyStateFunctions.push_back(
-                                std::bind( &simulation_setup::Body::getStateInBaseFrameFromEphemeris< double, double >,
-                                                                         bodyMap.at( perturbingBodies[ i ] ), std::placeholders::_1 ) );
+                        std::bind(
+                            &simulation_setup::Body::getStateInBaseFrameFromEphemeris< double, double >,
+                            bodyMap.at( perturbingBodies[ i ] ),
+                            std::placeholders::_1
+                        )
+                    );
 
                     // Set gravitational parameter function.
                     perturbingBodyGravitationalParameterFunctions.push_back(
                                 std::bind( &gravitation::GravityFieldModel::getGravitationalParameter,
                                              bodyMap.at( perturbingBodies[ i ] )->
                                              getGravityFieldModel( ) ) );
+
+                    if (jw_settings->j2) {
+                        unit_orientation_axes.push_back(jw_settings->orientation_axes[i].normalized());
+                    }
                 }
+
+
+
             }
 
             // Create light-time correction function
             lightTimeCorrection = std::make_shared< jw_lighttime_calculator >(
-                perturbingBodyStateFunctions, perturbingBodyGravitationalParameterFunctions, perturbingBodies,
-                transmitter.first, receiver.first,
-                jw_settings->shapiro, jw_settings->second_order,
-                jw_settings->velocity, jw_settings->j2,
+                perturbingBodyStateFunctions,
+                perturbingBodyGravitationalParameterFunctions,
+                jw_settings->j2_coefficients,
+                unit_orientation_axes,
+                perturbingBodies,
+                transmitter.first,
+                receiver.first,
+                jw_settings->shapiro,
+                jw_settings->second_order,
+                jw_settings->velocity,
+                jw_settings->j2,
                 std::bind( &relativity::PPNParameterSet::getParameterGamma, relativity::ppnParameterSet ) );
         }
 

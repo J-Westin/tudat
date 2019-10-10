@@ -25,6 +25,10 @@ namespace observation_models {
         //! Set of functions returning the gravitational parameters of the gravitating bodies.
         std::vector< std::function< double( ) > > perturbingBodyGravitationalParameterFunctions_;
 
+        std::vector< double > perturbing_body_j2_coefficients;
+
+        std::vector< Eigen::Vector3d > orientation_axes;
+
         //! Names of bodies causing light-time correction.
         std::vector< std::string > perturbingBodyNames_;
 
@@ -49,6 +53,14 @@ namespace observation_models {
         //! Total light-time correction, as computed by last call to calculateLightTimeCorrection.
         double currentTotalLightTimeCorrection_;
 
+        std::vector<double> history_total;
+        std::vector<double> history_shapiro;
+        std::vector<double> history_second_order;
+        std::vector<double> history_velocity;
+        std::vector<double> history_j2;
+
+        std::vector<double> history_time;
+
     public:
         //! Constructor, takes and sets gravitating body properties.
         /*!
@@ -66,6 +78,8 @@ namespace observation_models {
         jw_lighttime_calculator(
             const std::vector< std::function< Eigen::Vector6d( const double ) > >& perturbingBodyStateFunctions,
             const std::vector< std::function< double( ) > >& perturbingBodyGravitationalParameterFunctions,
+            const std::vector< double >& perturbing_body_j2_coefficients,
+            const std::vector< Eigen::Vector3d>& orientation_axes,
             const std::vector< std::string > perturbingBodyNames,
             const std::string transmittingBody,
             const std::string receivingBody,
@@ -78,6 +92,8 @@ namespace observation_models {
              :  LightTimeCorrection( first_order_relativistic ),
                 perturbingBodyStateFunctions_( perturbingBodyStateFunctions ),
                 perturbingBodyGravitationalParameterFunctions_( perturbingBodyGravitationalParameterFunctions ),
+                perturbing_body_j2_coefficients(perturbing_body_j2_coefficients),
+                orientation_axes(orientation_axes),
                 perturbingBodyNames_( perturbingBodyNames ),
                 shapiro_flag(shapiro),
                 second_order_flag(second_order),
@@ -178,6 +194,14 @@ namespace observation_models {
             return ret;
         }
 
+        double compute_evaluation_time(
+            const Eigen::Vector6d& transmitterState,
+            const Eigen::Vector6d& receiverState,
+            const Eigen::Vector6d& cb_state,
+            const double transmissionTime,
+            const double receptionTime
+        );
+
 
 
         std::vector< std::string > getPerturbingBodyNames( ) {
@@ -198,6 +222,72 @@ namespace observation_models {
 
         std::function< double( ) > getPpnParameterGammaFunction_( ) {
             return ppnParameterGammaFunction_;
+        }
+
+        Eigen::Matrix<double, Eigen::Dynamic, 6> get_history_all() {
+            unsigned int N = history_time.size();
+            Eigen::Matrix<double, Eigen::Dynamic, 6> history_matrix( N, 6 );
+
+            for (unsigned int i(0); i < N; i++) {
+                history_matrix(i,0) = history_time[i];
+                history_matrix(i,1) = history_total[i];
+                history_matrix(i,2) = history_shapiro[i];
+                history_matrix(i,3) = history_second_order[i];
+                history_matrix(i,4) = history_velocity[i];
+                history_matrix(i,5) = history_j2[i];
+            }
+
+            return history_matrix;
+        }
+
+        Eigen::VectorXd get_history_shapiro() {
+            unsigned int N = history_shapiro.size();
+
+            Eigen::VectorXd history_eigen( N );
+            for (unsigned int i(0); i < N; i++){
+                history_eigen[i] = history_shapiro[i];
+            }
+            return history_eigen;
+        }
+
+        Eigen::VectorXd get_history_velocity() {
+            unsigned int N = history_velocity.size();
+
+            Eigen::VectorXd history_eigen( N );
+            for (unsigned int i(0); i < N; i++){
+                history_eigen[i] = history_velocity[i];
+            }
+            return history_eigen;
+        }
+
+        Eigen::VectorXd get_history_j2() {
+            unsigned int N = history_j2.size();
+
+            Eigen::VectorXd history_eigen( N );
+            for (unsigned int i(0); i < N; i++){
+                history_eigen[i] = history_j2[i];
+            }
+            return history_eigen;
+        }
+
+        Eigen::VectorXd get_history_second_order() {
+            unsigned int N = history_second_order.size();
+
+            Eigen::VectorXd history_eigen( N );
+            for (unsigned int i(0); i < N; i++){
+                history_eigen[i] = history_second_order[i];
+            }
+            return history_eigen;
+        }
+
+        Eigen::VectorXd get_history_time() {
+            unsigned int N = history_time.size();
+
+            Eigen::VectorXd history_eigen( N );
+            for (unsigned int i(0); i < N; i++){
+                history_eigen[i] = history_time[i];
+            }
+            return history_eigen;
         }
     };
 
