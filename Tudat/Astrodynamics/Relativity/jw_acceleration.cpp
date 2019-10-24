@@ -31,7 +31,8 @@ namespace jw {
     Eigen::Vector3d schwarzschild_acceleration(
         Eigen::Vector6d state_subject,
         Eigen::Vector6d state_actor,
-        double mu_actor
+        double mu_actor,
+        double ppn_gamma
     ) {
         Eigen::Vector6d state_sa = state_subject - state_actor;
         Eigen::Vector3d pos_sa = state_sa.segment(0,3);

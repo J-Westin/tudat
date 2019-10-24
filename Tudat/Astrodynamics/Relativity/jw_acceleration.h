@@ -23,7 +23,8 @@ namespace jw {
     Eigen::Vector3d schwarzschild_acceleration(
         Eigen::Vector6d state_subject,
         Eigen::Vector6d state_actor,
-        double mu_actor
+        double mu_actor,
+        double ppn_gamma
     );
 
     Eigen::Vector3d cb_velocity_acceleration(
@@ -65,6 +66,8 @@ namespace jw {
              de_sitter_flag, cb_velocity_flag, cb_acceleration_flag,
              lense_thirring_flag, wavi_flag;
 
+        std::function< double() > ppn_gamma_function;
+
         //std::shared_ptr<jw_acceleration_settings> acceleration_settings;
 
         Eigen::Vector3d current_acceleration;
@@ -94,7 +97,8 @@ namespace jw {
             bool cb_velocity_flag,
             bool cb_acceleration_flag,
             bool lense_thirring_flag,
-            bool wavi_flag
+            bool wavi_flag,
+            std::function< double() > ppn_gamma_function = [ ]( ){ return 1.0; }
             //std::shared_ptr<jw_acceleration_settings> acceleration_settings
         ):
             state_function_subject(state_function_subject),
@@ -108,7 +112,8 @@ namespace jw {
             cb_velocity_flag(cb_velocity_flag),
             cb_acceleration_flag(cb_acceleration_flag),
             lense_thirring_flag(lense_thirring_flag),
-            wavi_flag(wavi_flag)
+            wavi_flag(wavi_flag),
+            ppn_gamma_function(ppn_gamma_function)
         { }
 
 
@@ -183,6 +188,22 @@ namespace jw {
             return component_vector;
         }
 
+        std::function< Eigen::Vector6d() > get_state_function_subject () {
+            return state_function_subject;
+        }
+
+        std::function< Eigen::Vector6d() > get_state_function_actor () {
+            return state_function_actor;
+        }
+
+        std::function< double() > get_mu_function_actor () {
+            return mu_function_actor;
+        }
+
+        std::function< double() > get_ppn_gamma_function () {
+            return ppn_gamma_function;
+        }
+
         void updateMembers( const double currentTime = TUDAT_NAN ) {
             Eigen::Vector6d state_subject = state_function_subject();
             Eigen::Vector6d state_actor   = state_function_actor();
@@ -190,6 +211,8 @@ namespace jw {
 
             double mu_actor   = mu_function_actor();
             double mu_primary = mu_function_primary();
+
+            double ppn_gamma = ppn_gamma_function();
 
             current_acceleration.setZero();
             current_kinetic_acceleration.setZero();
@@ -215,7 +238,8 @@ namespace jw {
                     schwarzschild_acceleration(
                         state_subject,
                         state_actor,
-                        mu_actor
+                        mu_actor,
+                        ppn_gamma
                     );
 
                 current_acceleration += current_schwarzschild_acceleration;

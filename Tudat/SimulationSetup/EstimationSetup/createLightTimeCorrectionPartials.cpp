@@ -13,6 +13,7 @@
 #include "Tudat/Astrodynamics/OrbitDetermination/LightTimeCorrectionPartials/firstOrderRelativisticLightTimeCorrectionPartial.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createLightTimeCorrectionPartials.h"
 
+#include <iostream>
 
 namespace tudat
 {
@@ -26,6 +27,9 @@ std::vector< std::shared_ptr< LightTimeCorrectionPartial > > createLightTimeCorr
 {
     std::vector< std::shared_ptr< LightTimeCorrectionPartial > > partialList;
 
+    std::cout << __FILE__ << std::endl
+        << "lightTimeCorrectionList contains " << lightTimeCorrectionList.size() << " elements" << std::endl
+        << "Entry 0 has type " << lightTimeCorrectionList.at( 0 )->getLightTimeCorrectionType( ) << std::endl;
     // Iterate over all light time corrections
     for( unsigned int i = 0; i < lightTimeCorrectionList.size( ); i++ )
     {
@@ -34,6 +38,8 @@ std::vector< std::shared_ptr< LightTimeCorrectionPartial > > createLightTimeCorr
         {
         case observation_models::first_order_relativistic:
         {
+            //std::cout << "Current entry has type " << lightTimeCorrectionList.at( i )->getLightTimeCorrectionType( ) << std::endl;
+
             std::shared_ptr< observation_models::FirstOrderLightTimeCorrectionCalculator > currentCorrection =
                     std::dynamic_pointer_cast< observation_models::FirstOrderLightTimeCorrectionCalculator >(
                         lightTimeCorrectionList.at( i ) );

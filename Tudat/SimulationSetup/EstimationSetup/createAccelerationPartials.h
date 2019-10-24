@@ -33,6 +33,8 @@
 #include "Tudat/Astrodynamics/BasicAstrodynamics/accelerationModelTypes.h"
 #include "Tudat/Astrodynamics/OrbitDetermination/AccelerationPartials/tidalLoveNumberPartialInterface.h"
 
+#include "Tudat/Astrodynamics/OrbitDetermination/AccelerationPartials/jw_acceleration_partial.h"
+
 namespace tudat
 {
 
@@ -417,6 +419,25 @@ std::shared_ptr< acceleration_partials::AccelerationPartial > createAnalyticalAc
         }
         break;
     }
+
+    case jw_acceleration:
+    {
+        // Check if identifier is consistent with type.
+        if( std::dynamic_pointer_cast< jw::jw_acceleration >( accelerationModel ) == nullptr ) {
+            throw std::runtime_error(
+                "Acceleration class type does not match acceleration type (jw_acceleration) when making acceleration partial."
+            );
+        }
+        else
+        {
+            // Create partial-calculating object.
+            accelerationPartial = std::make_shared< tudat::acceleration_partials::jw_acceleration_partial  >
+                    ( std::dynamic_pointer_cast< jw::jw_acceleration >( accelerationModel ),
+                      acceleratedBody.first, acceleratingBody.first );
+        }
+        break;
+    }
+
     default:
         std::string errorMessage = "Acceleration model " + std::to_string( accelerationType ) +
                 " not found when making acceleration partial";

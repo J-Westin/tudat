@@ -89,7 +89,7 @@ namespace observation_models {
             const bool j2,
             const std::function< double( ) >& ppnParameterGammaFunction = [ ]( ){ return 1.0; } )
 
-             :  LightTimeCorrection( first_order_relativistic ),
+             :  LightTimeCorrection( jw_lighttime ),
                 perturbingBodyStateFunctions_( perturbingBodyStateFunctions ),
                 perturbingBodyGravitationalParameterFunctions_( perturbingBodyGravitationalParameterFunctions ),
                 perturbing_body_j2_coefficients(perturbing_body_j2_coefficients),

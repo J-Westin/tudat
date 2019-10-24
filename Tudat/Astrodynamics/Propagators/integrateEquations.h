@@ -418,6 +418,10 @@ void propagateToExactTerminationCondition(
     integrator->setStepSizeControl( true );
 }
 
+#ifndef YEET_DEBUG
+    #define YEET_DEBUG std::cout << "Line " << __LINE__ << std::endl
+#endif // YEET_DEBUG
+
 //! Function to numerically integrate a given first order differential equation
 /*!
  *  Function to numerically integrate a given first order differential equation, with the state derivative a function of
@@ -546,9 +550,13 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
                             nan_or_inf_detected_in_state );
             }
 
+            YEET_DEBUG;
+
             currentCPUTime = std::chrono::duration_cast< std::chrono::nanoseconds >(
                         std::chrono::steady_clock::now( ) - initialClockTime ).count( ) * 1.0e-9;
             cumulativeComputationTimeHistory[ currentTime ] = currentCPUTime;
+
+            YEET_DEBUG;
 
             // Print solutions
             if( printInterval == printInterval )
@@ -563,6 +571,8 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
                 }
             }
 
+            YEET_DEBUG;
+
             if( propagationTerminationCondition->checkStopCondition( static_cast< double >( currentTime ), currentCPUTime ) )
             {
                 if( propagationTerminationCondition->getTerminateExactlyOnFinalCondition( ) )
@@ -572,6 +582,8 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
                                 timeStep, dependentVariableFunction,
                                 solutionHistory, dependentVariableHistory, currentCPUTime );
                 }
+
+                YEET_DEBUG;
 
                 // Set termination details
                 if( propagationTerminationCondition->getTerminationType( ) != hybrid_stopping_condition )
@@ -592,8 +604,13 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
                                 std::dynamic_pointer_cast< HybridPropagationTerminationCondition >(
                                     propagationTerminationCondition ) );
                 }
+
+                YEET_DEBUG;
+
                 breakPropagation = true;
             }
+
+            YEET_DEBUG;
         }
         catch( const std::exception& caughtException )
         {
