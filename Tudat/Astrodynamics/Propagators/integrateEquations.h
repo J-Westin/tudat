@@ -499,17 +499,35 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
     {
         try
         {
+            YEET_DEBUG;
+
+            std::cout << newState << std::endl;
+
+            YEET_DEBUG;
+
             if( ( newState.allFinite( ) == true ) && ( !newState.hasNaN( ) ) )
             {
                 previousTime = currentTime;
 
+                YEET_DEBUG;
+
                 // Perform integration step.
                 newState = integrator->performIntegrationStep( timeStep );
+
+                YEET_DEBUG;
+
                 if( statePostProcessingFunction != nullptr )
                 {
                     statePostProcessingFunction( newState );
+
+                    YEET_DEBUG;
+
                     integrator->modifyCurrentState( newState, true );
+
+                    YEET_DEBUG;
                 }
+
+                YEET_DEBUG;
 
                 // Check if the termination condition was reached during evaluation of integration sub-steps.
                 // If evaluation of the termination condition during integration sub-steps is disabled,
@@ -523,6 +541,8 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
                     break;
                 }
 
+                YEET_DEBUG;
+
                 // Update epoch and step-size
                 currentTime = integrator->getCurrentIndependentVariable( );
                 timeStep = integrator->getNextStepSize( );
@@ -530,6 +550,9 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
                 // Save integration result in map
                 saveIndex++;
                 saveIndex = saveIndex % saveFrequency;
+
+                YEET_DEBUG;
+
                 if( saveIndex == 0 )
                 {
                     solutionHistory[ currentTime ] = newState;
@@ -540,6 +563,8 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
                         dependentVariableHistory[ currentTime ] = dependentVariableFunction( );
                     }
                 }
+
+                YEET_DEBUG;
             }
             else
             {
