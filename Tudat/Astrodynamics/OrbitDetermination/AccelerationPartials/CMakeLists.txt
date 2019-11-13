@@ -22,6 +22,7 @@ set(ACCELERATION_PARTIALS_SOURCES
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/directTidalDissipationAccelerationPartial.cpp"
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/panelledRadiationPressureAccelerationPartial.cpp"
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/thrustAccelerationPartial.cpp"
+  "${SRCROOT}${ACCELERATIONPARTIALSDIR}/jw_acceleration_partial.cpp"
 )
 
 # Set the header files.
@@ -41,6 +42,7 @@ set(ACCELERATION_PARTIALS_HEADERS
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/directTidalDissipationAccelerationPartial.h"
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/panelledRadiationPressureAccelerationPartial.h"
   "${SRCROOT}${ACCELERATIONPARTIALSDIR}/thrustAccelerationPartial.h"
+  "${SRCROOT}${ACCELERATIONPARTIALSDIR}/jw_acceleration_partial.h"
 )
 
 # Add static libraries.

@@ -523,6 +523,7 @@ YEET_DEBUG;
         // Compute the state derivative.
         const IndependentVariableType time = this->currentIndependentVariable_ +
                 this->coefficients_.cCoefficients( stage ) * stepSize;YEET_DEBUG;
+        // CURRENT LOCATION WHERE THINGS GO TITS UP
         currentStateDerivatives_.push_back( this->stateDerivativeFunction_( time, intermediateState ) );YEET_DEBUG;
 
         // Check if propagation should terminate because the propagation termination condition has been reached
