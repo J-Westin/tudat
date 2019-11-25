@@ -423,7 +423,7 @@ std::shared_ptr< acceleration_partials::AccelerationPartial > createAnalyticalAc
     case jw_acceleration:
     {
         // Check if identifier is consistent with type.
-        if( std::dynamic_pointer_cast< jw::jw_acceleration >( accelerationModel ) == nullptr ) {
+        if( std::dynamic_pointer_cast< gnv::jw_acceleration >( accelerationModel ) == nullptr ) {
             throw std::runtime_error(
                 "Acceleration class type does not match acceleration type (jw_acceleration) when making acceleration partial."
             );
@@ -432,7 +432,7 @@ std::shared_ptr< acceleration_partials::AccelerationPartial > createAnalyticalAc
         {
             // Create partial-calculating object.
             accelerationPartial = std::make_shared< tudat::acceleration_partials::jw_acceleration_partial  >
-                    ( std::dynamic_pointer_cast< jw::jw_acceleration >( accelerationModel ),
+                    ( std::dynamic_pointer_cast< gnv::jw_acceleration >( accelerationModel ),
                       acceleratedBody.first, acceleratingBody.first );
         }
         break;

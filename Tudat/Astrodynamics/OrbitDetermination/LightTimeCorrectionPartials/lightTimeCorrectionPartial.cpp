@@ -12,6 +12,7 @@
 
 #include "Tudat/Astrodynamics/OrbitDetermination/LightTimeCorrectionPartials/lightTimeCorrectionPartial.h"
 #include "Tudat/Astrodynamics/OrbitDetermination/LightTimeCorrectionPartials/firstOrderRelativisticLightTimeCorrectionPartial.h"
+#include "Tudat/Astrodynamics/OrbitDetermination/LightTimeCorrectionPartials/jw_lighttime_correction_partial.h"
 
 namespace tudat
 {
@@ -73,6 +74,45 @@ getLightTimeParameterPartialFunction(
         }
         break;
     }
+
+    case observation_models::jw_lighttime:
+    {
+        // Check consistency of input.
+        std::shared_ptr< jw_lighttime_correction_partial > currentLightTimeCorrectorPartial =
+                std::dynamic_pointer_cast< jw_lighttime_correction_partial >( lightTimeCorrectionPartial );
+        if( currentLightTimeCorrectorPartial == nullptr )
+        {
+            std::string errorMessage = "Error when getting light time correction partial function, type " +
+                    std::to_string( lightTimeCorrectionPartial->getCorrectionType( ) ) +
+                       "is inconsistent with expected type, jw_lighttime.";
+            throw std::runtime_error( errorMessage );
+        }
+
+        // Set partial of gravitational parameter
+        if( parameterId.first == estimatable_parameters::gravitational_parameter )
+        {
+            // Retrieve function from jw_lighttime_correction_partial if correction depends on
+            // body associated with parameter.
+            std::vector< std::string > perturbingBodies = currentLightTimeCorrectorPartial->getPerturbingBodies( );
+            std::vector< std::string >::iterator findIterator = std::find(
+                        perturbingBodies.begin( ), perturbingBodies.end( ), parameterId.second.first );
+            if( findIterator != perturbingBodies.end( ) )
+            {
+                int bodyIndex = std::distance( perturbingBodies.begin( ),  findIterator );
+                partialFunction = std::make_pair(
+                            std::bind( &jw_lighttime_correction_partial::wrtBodyGravitationalParameter,
+                                         currentLightTimeCorrectorPartial, std::placeholders::_1, std::placeholders::_2, bodyIndex ), 1 );
+            }
+        }
+        else if( parameterId.first == estimatable_parameters::ppn_parameter_gamma )
+        {
+            partialFunction = std::make_pair(
+                        std::bind( &jw_lighttime_correction_partial::wrtPpnParameterGamma,
+                                     currentLightTimeCorrectorPartial, std::placeholders::_1, std::placeholders::_2 ), 1 );
+        }
+        break;
+    }
+
     default:
         std::string errorMessage = "Error, light time correction type " + std::to_string(
                     lightTimeCorrectionPartial->getCorrectionType( ) ) + "not found when creating partial ";

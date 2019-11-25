@@ -1288,7 +1288,7 @@ std::shared_ptr< propulsion::MomentumWheelDesaturationThrustAcceleration > creat
                 desaturationAccelerationSettings->maneuverRiseTime_ );
 }
 
-std::shared_ptr< jw::jw_acceleration >
+std::shared_ptr< gnv::jw_acceleration >
     create_jw_acceleration(
         const std::shared_ptr< Body > body_subject,
         const std::shared_ptr< Body > body_actor,
@@ -1322,7 +1322,7 @@ std::shared_ptr< jw::jw_acceleration >
 
     if ( !(jw_settings->de_sitter) ) {
 
-        return std::make_shared< jw::jw_acceleration > (
+        return std::make_shared< gnv::jw_acceleration > (
             state_function_subject,
             state_function_actor,
             mu_function_actor,
@@ -1347,7 +1347,7 @@ std::shared_ptr< jw::jw_acceleration >
         std::function< double() > mu_function_primary =
             std::bind( &GravityFieldModel::getGravitationalParameter, body_primary->getGravityFieldModel() );
 
-        return std::make_shared< jw::jw_acceleration > (
+        return std::make_shared< gnv::jw_acceleration > (
             state_function_subject,
             state_function_actor,
             state_function_primary,

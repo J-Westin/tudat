@@ -98,7 +98,7 @@ namespace acceleration_partials
 std::pair< std::function< void( Eigen::MatrixXd& ) >, int >
 jw_acceleration_partial::getParameterPartialFunction(
         std::shared_ptr< estimatable_parameters::EstimatableParameter< double > > parameter )
-{
+{YEET_DEBUG;
     std::function< void( Eigen::MatrixXd& ) > partialFunction;
     int numberOfRows = 0;
 
@@ -137,7 +137,7 @@ jw_acceleration_partial::getParameterPartialFunction(
 
 //! Function for updating partial w.r.t. the bodies' states
 void jw_acceleration_partial::update( const double currentTime )
-{
+{YEET_DEBUG;
     if( !( currentTime_ == currentTime ) )
     {
         currentRelativeState_ = ( acceleratedBodyState_( ) - centralBodyState_( ) );

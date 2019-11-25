@@ -20,6 +20,7 @@ set(OBSERVATION_PARTIALS_SOURCES
   "${SRCROOT}${OBSERVATIONPARTIALSDIR}/observationPartial.cpp"
   "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/lightTimeCorrectionPartial.cpp"
   "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/firstOrderRelativisticLightTimeCorrectionPartial.cpp"
+  "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/jw_lighttime_correction_partial.cpp"
 )
 
 # Set the header files.
@@ -36,6 +37,7 @@ set(OBSERVATION_PARTIALS_HEADERS
   "${SRCROOT}${OBSERVATIONPARTIALSDIR}/eulerAngleObservablePartials.h"
   "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/lightTimeCorrectionPartial.h"
   "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/firstOrderRelativisticLightTimeCorrectionPartial.h"
+  "${SRCROOT}${LIGHTTIMECORRECTIONPARTIALSDIR}/jw_lighttime_correction_partial.h"
 )
 
 # Set the header files.

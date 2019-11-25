@@ -13,6 +13,9 @@
 #include "Tudat/Astrodynamics/OrbitDetermination/LightTimeCorrectionPartials/firstOrderRelativisticLightTimeCorrectionPartial.h"
 #include "Tudat/SimulationSetup/EstimationSetup/createLightTimeCorrectionPartials.h"
 
+#include "Tudat/Astrodynamics/ObservationModels/ObservableCorrections/jw_lighttime_correction.h"
+#include "Tudat/Astrodynamics/OrbitDetermination/LightTimeCorrectionPartials/jw_lighttime_correction_partial.h"
+
 #include <iostream>
 
 namespace tudat
@@ -52,6 +55,24 @@ std::vector< std::shared_ptr< LightTimeCorrectionPartial > > createLightTimeCorr
                 // Create partial of first-order relativistic light-time correction
                 partialList.push_back(
                             std::make_shared< FirstOrderRelativisticLightTimeCorrectionPartial >( currentCorrection ) );
+            }
+
+            break;
+        }
+        case observation_models::jw_lighttime:
+        {
+            std::shared_ptr< observation_models::jw_lighttime_calculator > currentCorrection =
+                    std::dynamic_pointer_cast< observation_models::jw_lighttime_calculator >(
+                        lightTimeCorrectionList.at( i ) );
+            if( currentCorrection == nullptr )
+            {
+                throw std::runtime_error( "Error when making first order light time correction partial, type id observation_models::jw_lighttime not consistent with class type." );
+            }
+            else
+            {
+                // Create partial of first-order relativistic light-time correction
+                partialList.push_back(
+                            std::make_shared< jw_lighttime_correction_partial >( currentCorrection ) );
             }
 
             break;

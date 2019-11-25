@@ -5,7 +5,7 @@
 
 namespace tudat {
 
-namespace jw {
+namespace gnv {
 
     //! Function to calculate first order relativistic light time correction due to a gravitating point mass.
     double calculate_shapiro_lighttime(
@@ -166,6 +166,6 @@ namespace jw {
             return zero_vector;
     }
 
-} // namespace jw
+} // namespace gnv
 
 } // namespace tudat

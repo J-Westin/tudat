@@ -418,9 +418,7 @@ void propagateToExactTerminationCondition(
     integrator->setStepSizeControl( true );
 }
 
-#ifndef YEET_DEBUG
-    #define YEET_DEBUG std::cout << "Line " << __LINE__ << std::endl
-#endif // YEET_DEBUG
+
 
 //! Function to numerically integrate a given first order differential equation
 /*!
@@ -499,18 +497,14 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
     {
         try
         {
-            std::cout << newState << std::endl;
 
             if( ( newState.allFinite( ) == true ) && ( !newState.hasNaN( ) ) )
             {
                 previousTime = currentTime;
 
-                YEET_DEBUG;
-
                 // Perform integration step.
+                // THIS IS WHERE THINGS GO TITS UP
                 newState = integrator->performIntegrationStep( timeStep );
-
-                YEET_DEBUG;
 
                 if( statePostProcessingFunction != nullptr )
                 {
@@ -612,7 +606,8 @@ std::shared_ptr< PropagationTerminationDetails > integrateEquationsFromIntegrato
         {
             std::cerr << caughtException.what( ) << std::endl;
             std::cerr << "Error, propagation terminated at t=" + std::to_string( static_cast< double >( currentTime ) ) +
-                         ", returning propagation data up to current time." << std::endl;
+                         ", initial time was t0=" + std::to_string(static_cast<double> ( initialTime ) ) +
+                         ". returning propagation data up to current time." << std::endl;
             breakPropagation = true;
             propagationTerminationReason = std::make_shared< PropagationTerminationDetails >(
                         runtime_error_caught_in_propagation );

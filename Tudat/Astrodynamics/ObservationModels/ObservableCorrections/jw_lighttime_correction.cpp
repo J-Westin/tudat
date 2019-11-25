@@ -54,7 +54,7 @@ namespace observation_models {
                 );
 
             if (shapiro_flag || velocity_flag) {
-                current_shapiro = jw::calculate_shapiro_lighttime(
+                current_shapiro = gnv::calculate_shapiro_lighttime(
                     perturbingBodyGravitationalParameterFunctions_[ i ]( ),
                     transmitterState,
                     receiverState,
@@ -65,7 +65,7 @@ namespace observation_models {
                 total_shapiro += current_shapiro;
 
                 if (velocity_flag) {
-                    current_velocity = jw::calculate_velocity_lighttime(
+                    current_velocity = gnv::calculate_velocity_lighttime(
                         perturbingBodyGravitationalParameterFunctions_[ i ]( ),
                         transmitterState,
                         receiverState,
@@ -80,7 +80,7 @@ namespace observation_models {
             }
 
             if (second_order_flag) {
-                current_second_order = jw::calculate_second_order_lighttime(
+                current_second_order = gnv::calculate_second_order_lighttime(
                     perturbingBodyGravitationalParameterFunctions_[ i ]( ),
                     transmitterState,
                     receiverState,
@@ -93,7 +93,7 @@ namespace observation_models {
             }
 
             if (j2_flag) {
-                current_j2 = jw::calculate_j2_lighttime(
+                current_j2 = gnv::calculate_j2_lighttime(
                     perturbingBodyGravitationalParameterFunctions_[ i ]( ),
                     transmitterState,
                     receiverState,

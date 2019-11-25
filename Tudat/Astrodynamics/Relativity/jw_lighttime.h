@@ -11,7 +11,7 @@
 
 namespace tudat {
 
-namespace jw {
+namespace gnv {
 
     double calculate_shapiro_lighttime(
         const double mu_cb,
@@ -58,7 +58,7 @@ namespace jw {
 
 
 
-} // namespace jw
+} // namespace gnv
 
 } // namespace tudat
 

@@ -437,7 +437,7 @@ std::shared_ptr< basic_astrodynamics::EmpiricalAcceleration > createEmpiricalAcc
 
 
 
-std::shared_ptr< jw::jw_acceleration >
+std::shared_ptr< gnv::jw_acceleration >
     create_jw_acceleration(
         const std::shared_ptr< Body > body_subject,
         const std::shared_ptr< Body > body_actor,

@@ -13,7 +13,8 @@
 
 namespace tudat {
 
-namespace jw {
+namespace gnv {
+
     Eigen::Vector3d kinetic_acceleration(
         Eigen::Vector6d state_subject,
         Eigen::Vector6d state_actor,
@@ -294,7 +295,7 @@ namespace jw {
         }
     };
 
-} // namespace jw
+} // namespace gnv
 
 } // namespace tudat
 

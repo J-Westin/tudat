@@ -975,11 +975,11 @@ std::pair< std::function< Eigen::VectorXd( ) >, int > getVectorDependentVariable
                 );
 
             } else {
-                std::shared_ptr< jw::jw_acceleration > jw_acceleration_model =
-                    std::dynamic_pointer_cast< jw::jw_acceleration > ( list_of_jw_accelerations[0] );
+                std::shared_ptr< gnv::jw_acceleration > jw_acceleration_model =
+                    std::dynamic_pointer_cast< gnv::jw_acceleration > ( list_of_jw_accelerations[0] );
 
                 variableFunction = std::bind(
-                    &jw::jw_acceleration::get_acceleration_components,
+                    &gnv::jw_acceleration::get_acceleration_components,
                     jw_acceleration_model
                 );
 
@@ -1588,13 +1588,13 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                 );
 
             } else {
-                std::shared_ptr< jw::jw_acceleration > jw_acceleration_model =
-                    std::dynamic_pointer_cast< jw::jw_acceleration > ( list_of_jw_accelerations[0]
+                std::shared_ptr< gnv::jw_acceleration > jw_acceleration_model =
+                    std::dynamic_pointer_cast< gnv::jw_acceleration > ( list_of_jw_accelerations[0]
                 );
 
                 std::function< Eigen::Vector3d( ) > vector_function =
                     std::bind(
-                        &jw::jw_acceleration::get_schwarzschild_acceleration,
+                        &gnv::jw_acceleration::get_schwarzschild_acceleration,
                         jw_acceleration_model
                     );
 

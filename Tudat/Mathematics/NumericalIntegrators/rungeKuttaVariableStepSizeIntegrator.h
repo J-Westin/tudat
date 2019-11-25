@@ -489,76 +489,72 @@ extern template class RungeKuttaVariableStepSizeIntegrator < double, Eigen::Vect
 extern template class RungeKuttaVariableStepSizeIntegrator < double, Eigen::Vector6d, Eigen::Vector6d >;
 extern template class RungeKuttaVariableStepSizeIntegrator < double, Eigen::MatrixXd, Eigen::MatrixXd >;
 
-#ifndef YEET_DEBUG
-    #define YEET_DEBUG std::cout << "Line " << __LINE__ << std::endl
-#endif // YEET_DEBUG
-
 //! Perform a single integration step.
 template< typename IndependentVariableType, typename StateType, typename StateDerivativeType, typename TimeStepType >
 StateType
 RungeKuttaVariableStepSizeIntegrator< IndependentVariableType, StateType, StateDerivativeType, TimeStepType >
 ::performIntegrationStep( const TimeStepType stepSize )
 {
-    YEET_DEBUG;
+
     // Define and allocated vector for the number of stages.
     currentStateDerivatives_.clear( );
     currentStateDerivatives_.reserve( this->coefficients_.cCoefficients.rows( ) );
-    YEET_DEBUG;
+
     // Define lower and higher order estimates.
     StateType lowerOrderEstimate( this->currentState_ ), higherOrderEstimate( this->currentState_ );
-    YEET_DEBUG;
+
     // Compute the k_i state derivatives per stage.
     for ( int stage = 0; stage < this->coefficients_.cCoefficients.rows( ); stage++ )
-    {YEET_DEBUG;
+    {
         // Compute the intermediate state to pass to the state derivative for this stage.
         StateType intermediateState( this->currentState_ );
-YEET_DEBUG;
+
         // Compute the intermediate state.
         for ( int column = 0; column < stage; column++ )
-        {YEET_DEBUG;
+        {
             intermediateState += stepSize * this->coefficients_.aCoefficients( stage, column ) *
-                    currentStateDerivatives_[ column ];YEET_DEBUG;
+                    currentStateDerivatives_[ column ];
         }
 
         // Compute the state derivative.
         const IndependentVariableType time = this->currentIndependentVariable_ +
-                this->coefficients_.cCoefficients( stage ) * stepSize;YEET_DEBUG;
+                this->coefficients_.cCoefficients( stage ) * stepSize;
         // CURRENT LOCATION WHERE THINGS GO TITS UP
-        currentStateDerivatives_.push_back( this->stateDerivativeFunction_( time, intermediateState ) );YEET_DEBUG;
+        currentStateDerivatives_.push_back( this->stateDerivativeFunction_( time, intermediateState ) );
 
         // Check if propagation should terminate because the propagation termination condition has been reached
         // while computing the intermediate state.
         // If so, return immediately the current state (not recomputed yet), which will be discarded.
         if ( this->propagationTerminationFunction_( static_cast< double >( time ), TUDAT_NAN ) )
-        {YEET_DEBUG;
+        {
             this->propagationTerminationConditionReachedDuringStep_ = true;
-            return this->currentState_;YEET_DEBUG;
+            return this->currentState_;
         }
 
         // Update the estimate.
         lowerOrderEstimate += this->coefficients_.bCoefficients( 0, stage ) * stepSize *
-                currentStateDerivatives_[ stage ];YEET_DEBUG;
+                currentStateDerivatives_[ stage ];
         higherOrderEstimate += this->coefficients_.bCoefficients( 1, stage ) * stepSize *
-                currentStateDerivatives_[ stage ];YEET_DEBUG;
+                currentStateDerivatives_[ stage ];
     }
 
     // Determine if the error was within bounds and compute a new step size.
     if ( computeNextStepSizeAndValidateResult( lowerOrderEstimate,
                                                higherOrderEstimate, stepSize ) )
-    {YEET_DEBUG;
+    {
         // Accept the current step.
-        this->lastIndependentVariable_ = this->currentIndependentVariable_;YEET_DEBUG;
-        this->lastState_ = this->currentState_;YEET_DEBUG;
-        this->currentIndependentVariable_ += stepSize;YEET_DEBUG;
+        this->lastIndependentVariable_ = this->currentIndependentVariable_;
+        this->lastState_ = this->currentState_;
+        this->currentIndependentVariable_ += stepSize;
 
         switch ( this->coefficients_.orderEstimateToIntegrate )
         {
         case RungeKuttaCoefficients::lower:
-            this->currentState_ = lowerOrderEstimate;YEET_DEBUG;
+            this->currentState_ = lowerOrderEstimate;
             return this->currentState_;
 
         case RungeKuttaCoefficients::higher:
-            this->currentState_ = higherOrderEstimate;YEET_DEBUG;
+            this->currentState_ = higherOrderEstimate;
             return this->currentState_;
 
         default: // The default case will never occur because OrderEstimateToIntegrate is an enum.
@@ -566,7 +562,7 @@ YEET_DEBUG;
         }
     }
     else
-    {YEET_DEBUG;
+    {
         // Reject current step.
         return performIntegrationStep( this->stepSize_ );
     }

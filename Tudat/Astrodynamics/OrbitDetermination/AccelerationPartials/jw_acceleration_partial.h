@@ -18,6 +18,10 @@
 #include "Tudat/Astrodynamics/Relativity/jw_acceleration.h"
 #include "Tudat/Astrodynamics/OrbitDetermination/AccelerationPartials/accelerationPartial.h"
 
+#ifndef YEET_DEBUG
+    #define YEET_DEBUG std::cout<<__FILE__<<"\n Line "<<__LINE__<<std::endl
+#endif // YEET_DEBUG
+
 namespace tudat
 {
 
@@ -100,18 +104,18 @@ public:
      *  \param acceleratingBody Body exerting acceleration.
      */
     jw_acceleration_partial(
-            const std::shared_ptr< jw::jw_acceleration > accelerationModel,
+            const std::shared_ptr< gnv::jw_acceleration > accelerationModel,
             const std::string& acceleratedBody,
             const std::string& acceleratingBody ):
         AccelerationPartial( acceleratedBody, acceleratingBody, basic_astrodynamics::jw_acceleration )
-    {
+    {YEET_DEBUG;
         centralBodyState_  = accelerationModel->get_state_function_actor( );
         acceleratedBodyState_ = accelerationModel->get_state_function_subject( );
 
         ppnGammaParameterFunction_ = accelerationModel->get_ppn_gamma_function( );
         //ppnBetaParameterFunction_ = accelerationModel->getPpnParameterBetaFunction_( );
         centralBodyGravitationalParameterFunction_ = accelerationModel->get_mu_function_actor( );
-        currentAccelerationFunction_ = std::bind( &jw::jw_acceleration::getAcceleration,
+        currentAccelerationFunction_ = std::bind( &gnv::jw_acceleration::getAcceleration,
                                                     accelerationModel );
     }
 
@@ -129,7 +133,7 @@ public:
     void wrtPositionOfAcceleratedBody(
             Eigen::Block< Eigen::MatrixXd > partialMatrix,
             const bool addContribution = 1, const int startRow = 0, const int startColumn = 0 )
-    {
+    {YEET_DEBUG;
         if( addContribution )
         {
             partialMatrix.block( startRow, startColumn, 3, 3 ) += currentPartialWrtPosition_;
@@ -153,7 +157,7 @@ public:
      */
     void wrtPositionOfAcceleratingBody( Eigen::Block< Eigen::MatrixXd > partialMatrix,
                                         const bool addContribution = 1, const int startRow = 0, const int startColumn = 0 )
-    {
+    {YEET_DEBUG;
         if( addContribution )
         {
             partialMatrix.block( startRow, startColumn, 3, 3 ) -= currentPartialWrtPosition_;
@@ -255,7 +259,7 @@ public:
      */
     std::pair< std::function< void( Eigen::MatrixXd& ) >, int >
     getParameterPartialFunction( std::shared_ptr< estimatable_parameters::EstimatableParameter< Eigen::VectorXd > > parameter )
-    {
+    {YEET_DEBUG;
         std::function< void( Eigen::MatrixXd& ) > partialFunction;
         return std::make_pair( partialFunction, 0 );
     }
