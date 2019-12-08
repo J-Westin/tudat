@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <vector>
+#include <iostream>
 
 #include <functional>
 #include <boost/lambda/lambda.hpp>
@@ -53,6 +54,8 @@ namespace observation_models {
         //! Total light-time correction, as computed by last call to calculateLightTimeCorrection.
         double currentTotalLightTimeCorrection_;
 
+        double currentShapiro_;
+
         std::vector<double> history_total;
         std::vector<double> history_shapiro;
         std::vector<double> history_second_order;
@@ -101,6 +104,12 @@ namespace observation_models {
                 j2_flag(j2),
                 ppnParameterGammaFunction_( ppnParameterGammaFunction ) {
 
+//                    std::cout << "Creating jw_lighttime_calculator:" << std::endl
+//                        << "      Shapiro : " << shapiro_flag << std::endl
+//                        << " Second Order : " << second_order_flag << std::endl
+//                        << "     Velocity : " << velocity_flag << std::endl
+//                        << "           J2 : " << j2_flag << std::endl;
+
                     currentTotalLightTimeCorrection_ = 0.0;
                     currentLighTimeCorrectionComponents_.resize( perturbingBodyNames_.size( ) );
 
@@ -124,6 +133,12 @@ namespace observation_models {
 
         //! Destructor
         ~jw_lighttime_calculator( ){ }
+
+//        // <DELETE THIS WHEN THE OBS PARTIAL SNAFU IS SOLVED>
+//        double last_tx_time, last_rx_time, last_eval_time;
+//        Eigen::Vector6d last_tx_state, last_rx_state, last_pert_state;
+//        double last_vu, last_shp;
+//        // </DELETE THIS WHEN THE OBS PARTIAL SNAFU IS SOLVED>
 
         //! Function to calculate first-order relativistic light time correction due to set of gravitating point masses.
         /*!
@@ -218,6 +233,10 @@ namespace observation_models {
 
         double getCurrentLightTimeCorrectionComponent( const int bodyIndex ) {
             return currentLighTimeCorrectionComponents_.at( bodyIndex );
+        }
+
+        double getCurrentShapiro() {
+            return currentShapiro_;
         }
 
         std::function< double( ) > getPpnParameterGammaFunction_( ) {

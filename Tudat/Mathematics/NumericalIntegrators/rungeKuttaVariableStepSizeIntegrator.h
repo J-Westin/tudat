@@ -29,6 +29,10 @@
 #include "Tudat/Mathematics/NumericalIntegrators/reinitializableNumericalIntegrator.h"
 #include "Tudat/Mathematics/NumericalIntegrators/rungeKuttaCoefficients.h"
 
+#ifndef YEET_DEBUG
+    #define YEET_DEBUG std::cout << __FILE__ << std::endl << "Line " << __LINE__ << std::endl
+#endif // YEET_DEBUG
+
 namespace tudat
 {
 

@@ -60,7 +60,7 @@ public:
       : LightTimeCorrectionPartial( observation_models::jw_lighttime ),
         correctionCalculator_( correctionCalculator )
     {
-        std::cout << "creating jw correction partial calculator." << std::endl;
+        //std::cout << "creating jw correction partial calculator." << std::endl;
 
         perturbingBodies_ = correctionCalculator_->getPerturbingBodyNames( );
         perturbingBodyGravitationalParameterFunctions_ =
@@ -85,11 +85,12 @@ public:
     {
         if( !( static_cast< int >( perturbingBodies_.size( ) ) > bodyIndex ) )
         {
-            throw std::runtime_error( "Error, bodyIndex in FirstOrderRelativisticLightTimeCorrectionPartial not consistent with contents" );
+            throw std::runtime_error( "Error, bodyIndex in jw_lighttime_correction_partial not consistent with contents" );
         }
 
         double partialValue = compute_jw_lighttime_partial_wrt_mu(
                     correctionCalculator_->getCurrentLightTimeCorrectionComponent( bodyIndex ),
+                    //correctionCalculator_->getCurrentTotalShapiro( ),
                     perturbingBodyGravitationalParameterFunctions_.at( bodyIndex )( ) );
         return std::make_pair(
                     ( Eigen::Matrix< double, 1, Eigen::Dynamic >( 1, 1 ) << partialValue ).finished( ),
@@ -106,8 +107,20 @@ public:
     SingleOneWayRangePartialReturnType wrtPpnParameterGamma(
             const std::vector< Eigen::Vector6d >& states, const std::vector< double >& times )
     {
+//        std::cout << correctionCalculator_->getCurrentTotalLightTimeCorrection( ) << std::endl;
+//        std::cout << "Last tx time: " << correctionCalculator_->last_tx_time << std::endl;
+//        std::cout << "Last rx time: " << correctionCalculator_->last_rx_time << std::endl;
+//        std::cout << "Last ev time: " << correctionCalculator_->last_eval_time << std::endl;
+//        std::cout << "Last tx state: " << correctionCalculator_->last_tx_state << std::endl;
+//        std::cout << "Last rx state: " << correctionCalculator_->last_rx_state << std::endl;
+//        std::cout << "Last pert state: " << correctionCalculator_->last_pert_state << std::endl;
+//
+//        std::cout << "Last velocity lighttime: " << correctionCalculator_->last_vu << std::endl;
+//        std::cout << "Last shapiro  lighttime: " << correctionCalculator_->last_shp << std::endl;
+
         double partialValue = compute_jw_lighttime_partial_wrt_gamma(
                     correctionCalculator_->getCurrentTotalLightTimeCorrection( ),
+                    //correctionCalculator_->getCurrentShapiro( ),
                     correctionCalculator_->getPpnParameterGammaFunction_( )( ) );
         return std::make_pair(
                     ( Eigen::Matrix< double, 1, Eigen::Dynamic >( 1, 1 ) << partialValue ).finished( ),

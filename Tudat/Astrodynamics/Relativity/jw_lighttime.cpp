@@ -1,6 +1,7 @@
 #include "Tudat/Astrodynamics/BasicAstrodynamics/physicalConstants.h"
 #include "Tudat/Astrodynamics/Relativity/jw_lighttime.h"
 
+#include <iostream>
 #include <cmath>
 
 namespace tudat {
@@ -24,6 +25,11 @@ namespace gnv {
             double r_tx = ( pos_tx - pos_cb ).norm( );
             double R_tr = ( pos_tx - pos_rx ).norm( );
 
+//            std::cout << "Shapiro Variables" << std::endl;
+//            std::cout << " factor " << ( 1.0 + ppn_gamma ) * mu_cb * physical_constants::INVERSE_CUBIC_SPEED_OF_LIGHT << std::endl;
+//            std::cout << "     t1 " << r_rx + r_tx << std::endl;
+//            std::cout << "     t2 " << R_tr << std::endl;
+
             // Calculate and return light time correction.
             return ( 1.0 + ppn_gamma ) * mu_cb * physical_constants::INVERSE_CUBIC_SPEED_OF_LIGHT *
                 std::log(
@@ -37,6 +43,7 @@ namespace gnv {
         const Eigen::Vector6d& state_tx,
         const Eigen::Vector6d& state_rx,
         const Eigen::Vector6d& state_cb,
+        const double dt,
         const double ppn_gamma
     ) {
         Eigen::Vector3d pos_tx, pos_rx, pos_cb, vel_cb;
@@ -57,17 +64,27 @@ namespace gnv {
 
         double g = 1.0/std::sqrt( 1.0 - b*b );
 
+        //double dt = 0.0;
+        Eigen::Vector3d gavoot = g*dt*vel_cb;
+
         Eigen::Vector3d R_ct, R_cr;
-        R_ct = pos_tx + (g*g/(1.0+g)) * (beta.dot(pos_tx - pos_cb)) * beta - pos_cb;
-        R_cr = pos_rx + (g*g/(1.0+g)) * (beta.dot(pos_rx - pos_cb)) * beta - pos_cb;
+        R_ct = pos_tx + (g*g/(1.0+g)) * (beta.dot(pos_tx - pos_cb)) * beta - pos_cb;// - gavoot;
+        R_cr = pos_rx + (g*g/(1.0+g)) * (beta.dot(pos_rx - pos_cb)) * beta - pos_cb;// - gavoot;
+//        R_ct = pos_tx + (g*g/(1.0+g)) * (beta.dot(pos_tx - pos_cb)) * beta - gavoot;
+//        R_cr = pos_rx + (g*g/(1.0+g)) * (beta.dot(pos_rx - pos_cb)) * beta - gavoot;
 
         double d_cr = R_cr.norm();
 
         double factor, frac_t1, frac_t2;
 
-        factor = 2*mu_cb*g*(1.0 - N_tr.dot(beta))/(c*c*c);
+        factor = (1 + ppn_gamma)*mu_cb*g*(1.0 - N_tr.dot(beta))/(c*c*c);
         frac_t1 = (R_ct + g*d_tr*beta).norm() + d_cr;
         frac_t2 = g*d_tr*(1.0 - beta.dot(N_tr));
+
+//        std::cout << "Velocity Variables" << std::endl;
+//        std::cout << " factor " << factor << std::endl;
+//        std::cout << "     t1 " << frac_t1 << std::endl;
+//        std::cout << "     t2 " << frac_t2 << std::endl;
 
         return factor * std::log( (frac_t1 + frac_t2) / (frac_t1 - frac_t2) );
 

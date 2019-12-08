@@ -10,6 +10,8 @@
 
 #include "Tudat/Astrodynamics/OrbitDetermination/LightTimeCorrectionPartials/jw_lighttime_correction_partial.h"
 
+#include <stdexcept>
+
 namespace tudat
 {
 
@@ -27,7 +29,14 @@ double compute_jw_lighttime_partial_wrt_mu(
 double compute_jw_lighttime_partial_wrt_gamma(
         const double totalLightTimeCorrection, const double ppnParameterGamma )
 {
-    return totalLightTimeCorrection / ( ppnParameterGamma + 1.0 );
+    double thicc = totalLightTimeCorrection / ( ppnParameterGamma + 1.0 );
+//    std::cout << "total light time correction = " << totalLightTimeCorrection << std::endl;
+//    std::cout << "gamma = " << ppnParameterGamma << std::endl;
+//    std::cout << "partial = " << thicc << std::endl;
+//
+//    throw std::runtime_error("AAAAAY STOP THIS IS SEEKENEENG");
+
+    return thicc;
 }
 
 

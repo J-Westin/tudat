@@ -137,6 +137,11 @@ public:
     void set_velocity     (const bool flag) { velocity = flag;     }
     void set_j2           (const bool flag) { j2 = flag;           }
 
+    bool get_shapiro()      { return shapiro; }
+    bool get_second_order() { return second_order; }
+    bool get_velocity()     { return velocity; }
+    bool get_j2()           { return j2; }
+
 };
 
 

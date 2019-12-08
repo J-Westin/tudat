@@ -68,6 +68,7 @@ namespace gnv {
              lense_thirring_flag, wavi_flag;
 
         std::function< double() > ppn_gamma_function;
+        std::function< double() > ppn_beta_function;
 
         //std::shared_ptr<jw_acceleration_settings> acceleration_settings;
 
@@ -99,7 +100,8 @@ namespace gnv {
             bool cb_acceleration_flag,
             bool lense_thirring_flag,
             bool wavi_flag,
-            std::function< double() > ppn_gamma_function = [ ]( ){ return 1.0; }
+            std::function< double() > ppn_gamma_function = [ ]( ){ return 1.0; },
+            std::function< double() > ppn_beta_function = [ ]( ){ return 1.0; }
             //std::shared_ptr<jw_acceleration_settings> acceleration_settings
         ):
             state_function_subject(state_function_subject),
@@ -114,7 +116,8 @@ namespace gnv {
             cb_acceleration_flag(cb_acceleration_flag),
             lense_thirring_flag(lense_thirring_flag),
             wavi_flag(wavi_flag),
-            ppn_gamma_function(ppn_gamma_function)
+            ppn_gamma_function(ppn_gamma_function),
+            ppn_beta_function(ppn_beta_function)
         { }
 
 
@@ -203,6 +206,10 @@ namespace gnv {
 
         std::function< double() > get_ppn_gamma_function () {
             return ppn_gamma_function;
+        }
+
+        std::function< double() > get_ppn_beta_function () {
+            return ppn_beta_function;
         }
 
         void updateMembers( const double currentTime = TUDAT_NAN ) {

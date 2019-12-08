@@ -21,6 +21,10 @@ namespace observation_models {
             const double receptionTime )
     {
         // Retrieve ppn parameter gamma.
+//        last_tx_time = transmissionTime;
+//        last_rx_time = receptionTime;
+//        last_tx_state = transmitterState;
+//        last_rx_state = receiverState;
 
 
         double ppnParameterGamma = ppnParameterGammaFunction_( );
@@ -42,6 +46,10 @@ namespace observation_models {
 
         // Iterate over all gravitating bodies.
         for( unsigned int i = 0; i < perturbingBodyStateFunctions_.size( ); i++ ) {
+            if (i >= 1) {
+                YEET_DEBUG;
+                std::cout << "More than one perturbing body in jw_lighttime_correction_calculator..." << std::endl;
+            }
             //evaluationTime = transmissionTime + lightTimeEvaluationContribution_.at( i ) * ( receptionTime - transmissionTime );
             //evaluationTime = compute_evaluation_time(transmitterState, receiverState, transmissionTime, receptionTime);
             evaluationTime =
@@ -70,6 +78,7 @@ namespace observation_models {
                         transmitterState,
                         receiverState,
                         perturbingBodyStateFunctions_[ i ]( evaluationTime ),
+                        receptionTime - evaluationTime,
                         ppnParameterGamma
                     );
 
@@ -107,21 +116,32 @@ namespace observation_models {
             }
         }
 
-
+//        last_vu = total_velocity;
+//        last_shp = total_shapiro;
+//
+//        last_pert_state = perturbingBodyStateFunctions_[ 0 ]( evaluationTime );
+//
+//        last_eval_time = evaluationTime;
 
         if (velocity_flag){
             currentTotalLightTimeCorrection_ += total_velocity;
             history_shapiro.push_back(total_shapiro);
             history_velocity.push_back(total_velocity - total_shapiro);
+
+            currentShapiro_ = total_shapiro;
         }
         else if (shapiro_flag) {
             currentTotalLightTimeCorrection_ += total_shapiro;
             history_shapiro.push_back(total_shapiro);
             history_velocity.push_back(0.0);
+
+            currentShapiro_ = total_shapiro;
         }
         else {
             history_shapiro.push_back(0.0);
             history_velocity.push_back(0.0);
+
+            currentShapiro_ = 0.0;
         }
 
         if (second_order_flag) {

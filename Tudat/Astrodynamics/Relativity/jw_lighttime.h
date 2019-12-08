@@ -26,6 +26,7 @@ namespace gnv {
         const Eigen::Vector6d& state_tx,
         const Eigen::Vector6d& state_rx,
         const Eigen::Vector6d& state_cb,
+        const double dt,
         const double ppn_gamma
     );
 

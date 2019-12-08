@@ -28,32 +28,32 @@ namespace tudat
 namespace acceleration_partials
 {
 
-////! Function to compute partial of Schwarzschild acceleration correction w.r.t. position of body undergoing acceleration
-///*!
-// * Function to compute partial of Schwarzschild acceleration correction w.r.t. position of body undergoing acceleration
-// * \param relativeState Cartesian state of body undergoing, w.r.t. body exerting, acceleration.
-// * \param currentAcceleration Current Schwarzschild acceleration correction
-// * \param partialMatrix Requested (returnd by reference)
-// * \param gravitationalParameter Gravitational parameter of body exerting acceleration.
-// * \param ppnParameterGamma PPN parameter gamma
-// * \param ppnParameterBeta PPN parameter beta
-// */
-//void computePartialOfSchwarzschildAccelerationCorrectionWrtPosition(
-//        const Eigen::Vector6d& relativeState, Eigen::Vector3d& currentAcceleration, Eigen::Matrix3d& partialMatrix,
-//        const double gravitationalParameter, const double ppnParameterGamma = 1.0, const double ppnParameterBeta = 1.0 );
-//
-////! Function to compute partial of Schwarzschild acceleration correction w.r.t. velocity of body undergoing acceleration
-///*!
-// * Function to compute partial of Schwarzschild acceleration correction w.r.t. velocity of body undergoing acceleration
-// * \param relativeState Cartesian state of body undergoing, w.r.t. body exerting, acceleration.
-// * \param partialMatrix Requested (returnd by reference)
-// * \param gravitationalParameter Gravitational parameter of body exerting acceleration.
-// * \param ppnParameterGamma PPN parameter gamma
-// */
-//void computePartialOfSchwarzschildAccelerationCorrectionWrtVelocity(
-//        const Eigen::Vector6d& relativeState, Eigen::Matrix3d& partialMatrix,
-//        const double gravitationalParameter, const double ppnParameterGamma = 1.0 );
-//
+//! Function to compute partial of Schwarzschild acceleration correction w.r.t. position of body undergoing acceleration
+/*!
+ * Function to compute partial of Schwarzschild acceleration correction w.r.t. position of body undergoing acceleration
+ * \param relativeState Cartesian state of body undergoing, w.r.t. body exerting, acceleration.
+ * \param currentAcceleration Current Schwarzschild acceleration correction
+ * \param partialMatrix Requested (returnd by reference)
+ * \param gravitationalParameter Gravitational parameter of body exerting acceleration.
+ * \param ppnParameterGamma PPN parameter gamma
+ * \param ppnParameterBeta PPN parameter beta
+ */
+void compute_jw_schwarzschild_wrt_position(
+        const Eigen::Vector6d& relativeState, Eigen::Vector3d& currentAcceleration, Eigen::Matrix3d& partialMatrix,
+        const double gravitationalParameter, const double ppnParameterGamma = 1.0, const double ppnParameterBeta = 1.0 );
+
+//! Function to compute partial of Schwarzschild acceleration correction w.r.t. velocity of body undergoing acceleration
+/*!
+ * Function to compute partial of Schwarzschild acceleration correction w.r.t. velocity of body undergoing acceleration
+ * \param relativeState Cartesian state of body undergoing, w.r.t. body exerting, acceleration.
+ * \param partialMatrix Requested (returnd by reference)
+ * \param gravitationalParameter Gravitational parameter of body exerting acceleration.
+ * \param ppnParameterGamma PPN parameter gamma
+ */
+void compute_jw_schwarzschild_wrt_velocity(
+        const Eigen::Vector6d& relativeState, Eigen::Matrix3d& partialMatrix,
+        const double gravitationalParameter, const double ppnParameterGamma = 1.0 );
+
 ////! Function to compute partial derivative of Schwarzschild acceleration correction w.r.t. central body gravitational patameter.
 ///*!
 // * Function to compute partial derivative of Schwarzschild acceleration correction w.r.t. central body gravitational patameter.
@@ -113,7 +113,7 @@ public:
         acceleratedBodyState_ = accelerationModel->get_state_function_subject( );
 
         ppnGammaParameterFunction_ = accelerationModel->get_ppn_gamma_function( );
-        //ppnBetaParameterFunction_ = accelerationModel->getPpnParameterBetaFunction_( );
+        ppnBetaParameterFunction_ = accelerationModel->get_ppn_beta_function( );
         centralBodyGravitationalParameterFunction_ = accelerationModel->get_mu_function_actor( );
         currentAccelerationFunction_ = std::bind( &gnv::jw_acceleration::getAcceleration,
                                                     accelerationModel );

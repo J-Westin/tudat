@@ -30,9 +30,6 @@ std::vector< std::shared_ptr< LightTimeCorrectionPartial > > createLightTimeCorr
 {
     std::vector< std::shared_ptr< LightTimeCorrectionPartial > > partialList;
 
-    std::cout << __FILE__ << std::endl
-        << "lightTimeCorrectionList contains " << lightTimeCorrectionList.size() << " elements" << std::endl
-        << "Entry 0 has type " << lightTimeCorrectionList.at( 0 )->getLightTimeCorrectionType( ) << std::endl;
     // Iterate over all light time corrections
     for( unsigned int i = 0; i < lightTimeCorrectionList.size( ); i++ )
     {
