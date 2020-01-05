@@ -911,9 +911,16 @@ std::shared_ptr< relativity::RelativisticAccelerationCorrection > createRelativi
                     std::bind( &GravityFieldModel::getGravitationalParameter, bodyExertingAcceleration->getGravityFieldModel( ) );
         }
 
+        // jw_tudacceleration
+        bool jw_accelerations_used =
+            relativisticAccelerationSettings->calculate_kinetic_correction ||
+            relativisticAccelerationSettings->calculate_cb_velocity_correction ||
+            relativisticAccelerationSettings->calculate_ext_gravito_correction; // || other_corrections;
+
         // Create acceleration model if only schwarzschild term is to be used.
         if( relativisticAccelerationSettings->calculateLenseThirringCorrection_ == false &&
-                relativisticAccelerationSettings->calculateDeSitterCorrection_ == false )
+                relativisticAccelerationSettings->calculateDeSitterCorrection_ == false &&
+                jw_accelerations_used == false )
         {
             std::function< double( ) > ppnGammaFunction = std::bind( &PPNParameterSet::getParameterGamma, ppnParameterSet );
             std::function< double( ) > ppnBetaFunction = std::bind( &PPNParameterSet::getParameterBeta, ppnParameterSet );
@@ -976,7 +983,13 @@ std::shared_ptr< relativity::RelativisticAccelerationCorrection > createRelativi
                           angularMomentumFunction,
                           std::bind( &PPNParameterSet::getParameterGamma, ppnParameterSet ),
                           std::bind( &PPNParameterSet::getParameterBeta, ppnParameterSet ),
-                          relativisticAccelerationSettings->calculateSchwarzschildCorrection_ );
+                          relativisticAccelerationSettings->calculateSchwarzschildCorrection_,
+                          // jw_tudacceleration
+                          relativisticAccelerationSettings->calculateDeSitterCorrection_,
+                          relativisticAccelerationSettings->calculate_kinetic_correction,
+                          relativisticAccelerationSettings->calculate_cb_velocity_correction,
+                          relativisticAccelerationSettings->calculate_ext_gravito_correction
+                        );
             }
             else
             {
@@ -988,7 +1001,13 @@ std::shared_ptr< relativity::RelativisticAccelerationCorrection > createRelativi
                           angularMomentumFunction,
                           std::bind( &PPNParameterSet::getParameterGamma, ppnParameterSet ),
                           std::bind( &PPNParameterSet::getParameterBeta, ppnParameterSet ),
-                          relativisticAccelerationSettings->calculateSchwarzschildCorrection_ );
+                          relativisticAccelerationSettings->calculateSchwarzschildCorrection_,
+                          // jw_tudacceleration
+                          relativisticAccelerationSettings->calculateLenseThirringCorrection_,
+                          relativisticAccelerationSettings->calculate_kinetic_correction,
+                          relativisticAccelerationSettings->calculate_cb_velocity_correction,
+                          relativisticAccelerationSettings->calculate_ext_gravito_correction
+                        );
             }
         }
     }

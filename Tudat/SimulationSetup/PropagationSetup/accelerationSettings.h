@@ -170,17 +170,26 @@ public:
      * function is temporary: in the future this will be done consistently with rotation/gravity field.
      */
     RelativisticAccelerationCorrectionSettings(
-            const bool calculateSchwarzschildCorrection = true,
-            const bool calculateLenseThirringCorrection = false,
-            const bool calculateDeSitterCorrection = false,
-            const std::string primaryBody = "",
-            const Eigen::Vector3d centralBodyAngularMomentum = Eigen::Vector3d::Zero( ) ):
+        const bool calculateSchwarzschildCorrection = true,
+        const bool calculateLenseThirringCorrection = false,
+        const bool calculateDeSitterCorrection = false,
+        const std::string primaryBody = "",
+        const Eigen::Vector3d centralBodyAngularMomentum = Eigen::Vector3d::Zero( ),
+        // jw_tudacceleration
+        const bool calculate_kinetic_correction = false,
+        const bool calculate_cb_velocity_correction = false,
+        const bool calculate_ext_gravito_correction = false
+    ) :
         AccelerationSettings(  basic_astrodynamics::relativistic_correction_acceleration ),
         calculateSchwarzschildCorrection_( calculateSchwarzschildCorrection ),
         calculateLenseThirringCorrection_( calculateLenseThirringCorrection ),
         calculateDeSitterCorrection_( calculateDeSitterCorrection ),
         primaryBody_( primaryBody ),
-        centralBodyAngularMomentum_( centralBodyAngularMomentum )
+        centralBodyAngularMomentum_( centralBodyAngularMomentum ),
+        // jw_tudacceleration
+        calculate_kinetic_correction(calculate_kinetic_correction),
+        calculate_cb_velocity_correction(calculate_cb_velocity_correction),
+        calculate_ext_gravito_correction(calculate_ext_gravito_correction)
     {
         if( calculateDeSitterCorrection_ && primaryBody_ == "" )
         {
@@ -204,7 +213,69 @@ public:
     //! Constant angular momentum of central body
     Eigen::Vector3d centralBodyAngularMomentum_;
 
+    // jw_tudacceleration zone
+    bool calculate_kinetic_correction;
+    bool calculate_cb_velocity_correction;
+    bool calculate_ext_gravito_correction;
+
 };
+
+////! Class to proivide settings for typical relativistic corrections to the dynamics of an orbiter.
+///*!
+// *  Class to proivide settings for typical relativistic corrections to the dynamics of an orbiter: the
+// *  Schwarzschild, Lense-Thirring and de Sitter terms. An excellent introduction to
+// *  these models is given in 'General Relativity and Space Geodesy' by L. Combrinck (2012).
+// */
+//class RelativisticAccelerationCorrectionSettings: public AccelerationSettings
+//{
+//public:
+//
+//    //! Constructor
+//    /*!
+//     * Constructor
+//     * \param calculateSchwarzschildCorrection Boolean denoting whether the Schwarzschild term is used.
+//     * \param calculateLenseThirringCorrection Boolean denoting whether the Lense-Thirring term is used.
+//     * \param calculateDeSitterCorrection Boolean denoting whether the de Sitter term is used.
+//     * \param primaryBody Name of primary body (e.g. Sun for acceleration acting on an Earth-orbiting satellite)
+//     * \param centralBodyAngularMomentum Constant angular momentum of central body. NOTE: Passing angular momentum through this
+//     * function is temporary: in the future this will be done consistently with rotation/gravity field.
+//     */
+//    RelativisticAccelerationCorrectionSettings(
+//            const bool calculateSchwarzschildCorrection = true,
+//            const bool calculateLenseThirringCorrection = false,
+//            const bool calculateDeSitterCorrection = false,
+//            const std::string primaryBody = "",
+//            const Eigen::Vector3d centralBodyAngularMomentum = Eigen::Vector3d::Zero( ) ):
+//        AccelerationSettings(  basic_astrodynamics::relativistic_correction_acceleration ),
+//        calculateSchwarzschildCorrection_( calculateSchwarzschildCorrection ),
+//        calculateLenseThirringCorrection_( calculateLenseThirringCorrection ),
+//        calculateDeSitterCorrection_( calculateDeSitterCorrection ),
+//        primaryBody_( primaryBody ),
+//        centralBodyAngularMomentum_( centralBodyAngularMomentum )
+//    {
+//        if( calculateDeSitterCorrection_ && primaryBody_ == "" )
+//        {
+//            throw std::runtime_error(
+//                        "Error when making relativistic acceleration correction, deSitter acceleration requested without primary body" );
+//        }
+//    }
+//
+//    //! Boolean denoting wheter the Schwarzschild term is used.
+//    bool calculateSchwarzschildCorrection_;
+//
+//    //! Boolean denoting wheter the Lense-Thirring term is used.
+//    bool calculateLenseThirringCorrection_;
+//
+//    //! Boolean denoting wheter the de Sitter term is used.
+//    bool calculateDeSitterCorrection_;
+//
+//    //! Name of primary body (e.g. Sun for acceleration acting on an Earth-orbiting satellite)
+//    std::string primaryBody_;
+//
+//    //! Constant angular momentum of central body
+//    Eigen::Vector3d centralBodyAngularMomentum_;
+//
+//};
 
 //! Class to define settings for empirical accelerations
 class EmpiricalAccelerationSettings: public AccelerationSettings

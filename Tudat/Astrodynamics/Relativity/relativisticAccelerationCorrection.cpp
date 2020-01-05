@@ -121,6 +121,44 @@ Eigen::Vector3d calculateDeSitterCorrectionAcceleration(
                 ppnParameterGamma );
 }
 
+    // jw_tudacceleration
+    Eigen::Vector3d calculateKineticAcceleration(
+            const Eigen::Vector3d& relativePosition,
+            const Eigen::Vector3d& velocityOfCentralBody,
+            const double commonCorrectionTerm
+    ) {
+        double v = velocityOfCentralBody.norm();
+        return -commonCorrectionTerm*v*v*relativePosition;
+    }
+
+    // jw_tudacceleration
+    Eigen::Vector3d calculateCbVelocityAcceleration(
+        const Eigen::Vector3d& relativePosition,
+        const Eigen::Vector3d& relativeVelocity,
+        const Eigen::Vector3d& velocityOfCentralBody,
+        const double commonCorrectionTerm
+    ) {
+        double r = relativePosition.norm();
+
+        return 0.5 * commonCorrectionTerm * relativePosition.dot(velocityOfCentralBody) * (
+                ( (3.0 * relativePosition.dot(velocityOfCentralBody)) / (r*r) ) * relativePosition
+                - 2.0*velocityOfCentralBody
+            );
+    }
+
+    // jw_tudacceleration
+    Eigen::Vector3d calculateExtGravitoAcceleration(
+        const Eigen::Vector3d& relativePosition,
+        const Eigen::Vector3d& relativeVelocity,
+        const Eigen::Vector3d& velocityOfCentralBody,
+        const double commonCorrectionTerm
+    ) {
+        return 4.0 * commonCorrectionTerm * (
+            velocityOfCentralBody.dot(relativeVelocity) * relativePosition
+            - relativePosition.dot(relativeVelocity) * velocityOfCentralBody
+        );
+    }
+
 }
 
 }

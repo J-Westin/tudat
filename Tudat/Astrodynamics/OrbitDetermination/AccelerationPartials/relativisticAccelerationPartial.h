@@ -109,7 +109,9 @@ public:
         // Only Schwarzschild correction is implemented so far.
         if( accelerationModel->getCalculateDeSitterCorrection( ) || accelerationModel->getCalculateLenseThirringCorrection( ) )
         {
-            throw std::runtime_error( "Error when creating relativistic acceleration correction partial, only Schwarzschild term implemented" );
+            // jw_tudacceleration
+            std::cerr << "Warning: Lense Thirring and de Sitter partials are not implemented!" << std::endl;
+            //throw std::runtime_error( "Error when creating relativistic acceleration correction partial, only Schwarzschild term implemented" );
         }
         centralBodyState_  = accelerationModel->getStateFunctionOfCentralBody( );
         acceleratedBodyState_ = accelerationModel->getStateFunctionOfAcceleratedBody( );

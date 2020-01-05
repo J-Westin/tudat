@@ -145,6 +145,29 @@ Eigen::Vector3d calculateDeSitterCorrectionAcceleration(
         const Eigen::Vector6d& orbitedBodyStateWrtLargerBody,
         const double ppnParameterGamma = 1.0 );
 
+//jw_tudacceleration
+Eigen::Vector3d calculateKineticAcceleration(
+    const Eigen::Vector3d& relativePosition,
+    const Eigen::Vector3d& velocityOfCentralBody,
+    const double commonCorrectionTerm
+);
+
+//jw_tudacceleration
+Eigen::Vector3d calculateCbVelocityAcceleration(
+    const Eigen::Vector3d& relativePosition,
+    const Eigen::Vector3d& relativeVelocity,
+    const Eigen::Vector3d& velocityOfCentralBody,
+    const double commonCorrectionTerm
+);
+
+//jw_tudacceleration
+Eigen::Vector3d calculateExtGravitoAcceleration(
+    const Eigen::Vector3d& relativePosition,
+    const Eigen::Vector3d& relativeVelocity,
+    const Eigen::Vector3d& velocityOfCentralBody,
+    const double commonCorrectionTerm
+);
+
 //! Class to compute typical relativistic corrections to the dynamics of an orbiter.
 /*!
  *  Class to compute typical relativistic corrections to the dynamics of an orbiter. The model allows the inclusion of the
@@ -182,7 +205,13 @@ public:
             std::function< Eigen::Vector3d( ) > centalBodyAngularMomentumFunction = std::function< Eigen::Vector3d( ) >( ),
             std::function< double( ) > ppnParameterGammaFunction = [ ]( ){ return 1.0; },
             std::function< double( ) > ppnParameterBetaFunction = [ ]( ){ return 1.0; },
-            const bool calculateSchwarzschildCorrection = true ):
+            const bool calculateSchwarzschildCorrection = true,
+            //jw_tudacceleration
+            const bool calculate_de_sitter_correction=true,
+            const bool calculate_kinetic_correction=false,
+            const bool calculate_cb_velocity_correction=false,
+            const bool calculate_ext_gravito_correction=false
+        ):
         AccelerationModel< Eigen::Vector3d >( ),
         stateFunctionOfAcceleratedBody_( stateFunctionOfAcceleratedBody ),
         stateFunctionOfCentralBody_( stateFunctionOfCentralBody ),
@@ -194,8 +223,12 @@ public:
         ppnParameterGammaFunction_( ppnParameterGammaFunction ),
         ppnParameterBetaFunction_( ppnParameterBetaFunction ),
         calculateSchwarzschildCorrection_( calculateSchwarzschildCorrection ),
-        calculateDeSitterCorrection_( true ),
-        calculateLenseThirringCorrection_( !( centalBodyAngularMomentumFunction == nullptr ) )
+        calculateDeSitterCorrection_( calculate_de_sitter_correction ), // jw_tudacceleration
+        calculateLenseThirringCorrection_( !( centalBodyAngularMomentumFunction == nullptr ) ),
+        // jw_tudacceleration
+        calculate_kinetic_correction(calculate_kinetic_correction),
+        calculate_cb_velocity_correction(calculate_cb_velocity_correction),
+        calculate_ext_gravito_correction(calculate_ext_gravito_correction)
     { }
 
     //! Constructor, used when including Lense-Thirring, but not de Sitter, acceleration
@@ -218,17 +251,27 @@ public:
             std::function< Eigen::Vector3d( ) > centalBodyAngularMomentumFunction,
             std::function< double( ) > ppnParameterGammaFunction = [ ]( ){ return 1.0; },
             std::function< double( ) > ppnParameterBetaFunction = [ ]( ){ return 1.0; },
-            const bool calculateSchwarzschildCorrection = true ):
-        AccelerationModel< Eigen::Vector3d >( ),
-        stateFunctionOfAcceleratedBody_( stateFunctionOfAcceleratedBody ),
-        stateFunctionOfCentralBody_( stateFunctionOfCentralBody ),
-        gravitationalParameterFunctionOfCentralBody_( gravitationalParameterFunctionOfCentralBody ),
-        centalBodyAngularMomentumFunction_( centalBodyAngularMomentumFunction ),
-        ppnParameterGammaFunction_( ppnParameterGammaFunction ),
-        ppnParameterBetaFunction_( ppnParameterBetaFunction ),
-        calculateSchwarzschildCorrection_( calculateSchwarzschildCorrection ),
-        calculateDeSitterCorrection_( false ),
-        calculateLenseThirringCorrection_( true )
+            const bool calculateSchwarzschildCorrection = true,
+            //jw_tudacceleration
+            const bool calculate_lense_thirring_correction=true,
+            const bool calculate_kinetic_correction=false,
+            const bool calculate_cb_velocity_correction=false,
+            const bool calculate_ext_gravito_correction=false
+        )
+          : AccelerationModel< Eigen::Vector3d >( ),
+            stateFunctionOfAcceleratedBody_( stateFunctionOfAcceleratedBody ),
+            stateFunctionOfCentralBody_( stateFunctionOfCentralBody ),
+            gravitationalParameterFunctionOfCentralBody_( gravitationalParameterFunctionOfCentralBody ),
+            centalBodyAngularMomentumFunction_( centalBodyAngularMomentumFunction ),
+            ppnParameterGammaFunction_( ppnParameterGammaFunction ),
+            ppnParameterBetaFunction_( ppnParameterBetaFunction ),
+            calculateSchwarzschildCorrection_( calculateSchwarzschildCorrection ),
+            calculateDeSitterCorrection_( false ),
+            calculateLenseThirringCorrection_( calculate_lense_thirring_correction ), // jw_tudacceleration
+            // jw_tudacceleration
+            calculate_kinetic_correction(calculate_kinetic_correction),
+            calculate_cb_velocity_correction(calculate_cb_velocity_correction),
+            calculate_ext_gravito_correction(calculate_ext_gravito_correction)
     { }
 
     //! Constructor, used for Schwarzschild term only
@@ -255,7 +298,11 @@ public:
         ppnParameterBetaFunction_( ppnParameterBetaFunction ),
         calculateSchwarzschildCorrection_( true ),
         calculateDeSitterCorrection_( false ),
-        calculateLenseThirringCorrection_( false )
+        calculateLenseThirringCorrection_( false ),
+        // jw_tudacceleration
+        calculate_kinetic_correction(false),
+        calculate_cb_velocity_correction(false),
+        calculate_ext_gravito_correction(false)
     { }
 
     //! Destructor
@@ -299,6 +346,8 @@ public:
             currentAcceleration_.setZero( );
 
             double relativeDistance = stateOfAcceleratedBodyWrtCentralBody_.segment( 0, 3 ).norm( );
+
+            Eigen::Vector6d cb_state = stateFunctionOfCentralBody_();
 
             // Compute Schwarzschild term (if requested)
             if( calculateSchwarzschildCorrection_ )
@@ -345,6 +394,35 @@ public:
                             largerBodyCommonCorrectionTerm,
                             ppnParameterGamma_ );
 
+            }
+
+            //jw_tudacceleration
+            if (calculate_kinetic_correction) {
+                currentAcceleration_ += calculateKineticAcceleration(
+                    stateOfAcceleratedBodyWrtCentralBody_.segment(0,3),
+                    cb_state.segment(3,3),
+                    commonCorrectionTerm_
+                );
+            }
+
+            //jw_tudacceleration
+            if (calculate_cb_velocity_correction) {
+                currentAcceleration_ += calculateCbVelocityAcceleration(
+                    stateOfAcceleratedBodyWrtCentralBody_.segment(0,3),
+                    stateOfAcceleratedBodyWrtCentralBody_.segment(3,3),
+                    cb_state.segment(3,3),
+                    commonCorrectionTerm_
+                );
+            }
+
+            //jw_tudacceleration
+            if (calculate_kinetic_correction) {
+                currentAcceleration_ += calculateExtGravitoAcceleration(
+                    stateOfAcceleratedBodyWrtCentralBody_.segment(0,3),
+                    stateOfAcceleratedBodyWrtCentralBody_.segment(3,3),
+                    cb_state.segment(3,3),
+                    commonCorrectionTerm_
+                );
             }
 
 
@@ -415,6 +493,11 @@ public:
      */
     bool getCalculateLenseThirringCorrection( )
     { return calculateLenseThirringCorrection_; }
+
+    //jw_tudacceleration
+    bool get_kinetic_flag() { return calculate_kinetic_correction; }
+    bool get_cb_velocity_flag() { return calculate_cb_velocity_correction; }
+    bool get_ext_gravito_flag() { return calculate_ext_gravito_correction; }
 
     std::string getPrimaryBodyName( )
     { return primaryBodyName_; }
@@ -490,6 +573,11 @@ private:
     //! Boolean denoting wheter the Lense-Thirring term is used.
     bool calculateLenseThirringCorrection_;
 
+
+    // jw_tudacceleration
+    bool calculate_kinetic_correction;
+    bool calculate_cb_velocity_correction;
+    bool calculate_ext_gravito_correction;
 
 
     //! Relativistic acceleration correction, as computed by last call to updateMembers function
