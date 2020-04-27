@@ -397,9 +397,19 @@ simulateObservationsWithNoise(
                     }
                 }
 
+                //jw_party_hour
+                Eigen::VectorXd current_noise_to_add_double = currentNoiseFunction( nominalTimes.at( i ) );
+                Eigen::Matrix<ObservationScalarType, Eigen::Dynamic, 1> current_noise_to_add_custom(current_noise_to_add_double.rows());
+
+                for (unsigned int j(0); j < current_noise_to_add_double.rows(); j++){
+                    //std::cout << "Hello" << std::endl;
+                    current_noise_to_add_custom[j] = current_noise_to_add_double[j];
+                    //std::cout << "World" << std::endl;
+                }
+
                 // Add noise to observation
                 noisyObservations.segment( i * currentObservableSize, currentObservableSize ) +=
-                        currentNoiseFunction( nominalTimes.at( i ) );
+                        current_noise_to_add_custom;
             }
 
             singleObservableObservationsWithNoise[ linkIterator->first ] =
