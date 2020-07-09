@@ -8,6 +8,16 @@ namespace tudat {
 
 namespace gnv {
 
+    Eigen::Vector3d ext_pot_acceleration(
+        const Eigen::Vector3d& relativePosition,
+        const Eigen::Vector3d& relativePosition_cb_wrt_primary,
+        const double commonCorrectionTerm,
+        const double mu_primary
+    ) {
+        double rab = relativePosition_cb_wrt_primary.norm();
+        return (commonCorrectionTerm*mu_primary/rab)*relativePosition;
+    }
+
     Eigen::Vector3d kinetic_acceleration(
         Eigen::Vector6d state_subject,
         Eigen::Vector6d state_actor,

@@ -15,6 +15,14 @@ namespace tudat {
 
 namespace gnv {
 
+    // De Sitter Magnum Override
+    Eigen::Vector3d ext_pot_acceleration(
+        const Eigen::Vector3d& relativePosition,
+        const Eigen::Vector3d& relativePosition_cb_wrt_primary,
+        const double commonCorrectionTerm,
+        const double mu_primary
+    );
+
     Eigen::Vector3d kinetic_acceleration(
         Eigen::Vector6d state_subject,
         Eigen::Vector6d state_actor,
@@ -265,13 +273,26 @@ namespace gnv {
             }
 
             if (de_sitter_flag) {
+                //De Sitter Magnum Override
+                double r_sa, c_lum, phi_common;
+                r_sa = ((state_subject - state_actor).segment(0,3)).norm();
+                c_lum = physical_constants::SPEED_OF_LIGHT;
+                phi_common = mu_actor/(r_sa*r_sa*r_sa*c_lum*c_lum);
+
                 current_de_sitter_acceleration =
-                    de_sitter_acceleration (
-                        state_subject,
-                        state_actor,
-                        state_primary,
+                    ext_pot_acceleration(
+                        (state_subject - state_actor).segment(0,3),
+                        (state_actor - state_primary).segment(0,3),
+                        phi_common,
                         mu_primary
                     );
+
+//                    de_sitter_acceleration (
+//                        state_subject,
+//                        state_actor,
+//                        state_primary,
+//                        mu_primary
+//                    );
 
                 current_acceleration += current_de_sitter_acceleration;
             }

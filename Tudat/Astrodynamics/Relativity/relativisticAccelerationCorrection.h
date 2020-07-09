@@ -146,6 +146,15 @@ Eigen::Vector3d calculateDeSitterCorrectionAcceleration(
         const double ppnParameterGamma = 1.0 );
 
 //jw_tudacceleration
+// De Sitter Magnum Override
+Eigen::Vector3d calculateExtPotentialAcceleration(
+    const Eigen::Vector3d& relativePosition,
+    const Eigen::Vector3d& relativePosition_cb_wrt_primary,
+    const double commonCorrectionTerm,
+    const double mu_primary
+);
+
+//jw_tudacceleration
 Eigen::Vector3d calculateKineticAcceleration(
     const Eigen::Vector3d& relativePosition,
     const Eigen::Vector3d& velocityOfCentralBody,
@@ -165,7 +174,8 @@ Eigen::Vector3d calculateExtGravitoAcceleration(
     const Eigen::Vector3d& relativePosition,
     const Eigen::Vector3d& relativeVelocity,
     const Eigen::Vector3d& velocityOfCentralBody,
-    const double commonCorrectionTerm
+    const double commonCorrectionTerm,
+    const double ppnParameterGamma = 1.0
 );
 
 //! Class to compute typical relativistic corrections to the dynamics of an orbiter.
@@ -387,12 +397,21 @@ public:
                         primaryDistance * primaryDistance * primaryDistance *
                             physical_constants::SPEED_OF_LIGHT * physical_constants::SPEED_OF_LIGHT );
 
-                currentAcceleration_ += calculateDeSitterCorrectionAcceleration(
-                            stateOfAcceleratedBodyWrtCentralBody_.segment( 3, 3 ),
-                            stateOfCentralBodyWrtPrimaryBody_.segment( 0, 3 ),
-                            stateOfCentralBodyWrtPrimaryBody_.segment( 3, 3 ),
-                            largerBodyCommonCorrectionTerm,
-                            ppnParameterGamma_ );
+                //jw_tudacceleration
+                // Simple De-Sitter Magnum Override^TM
+                currentAcceleration_ += calculateExtPotentialAcceleration(
+                    stateOfAcceleratedBodyWrtCentralBody_.segment(0,3),
+                    stateOfCentralBodyWrtPrimaryBody_.segment(0,3),
+                    commonCorrectionTerm_,
+                    gravitationalParameterOfPrimaryBody_
+                );
+
+//                currentAcceleration_ += calculateDeSitterCorrectionAcceleration(
+//                            stateOfAcceleratedBodyWrtCentralBody_.segment( 3, 3 ),
+//                            stateOfCentralBodyWrtPrimaryBody_.segment( 0, 3 ),
+//                            stateOfCentralBodyWrtPrimaryBody_.segment( 3, 3 ),
+//                            largerBodyCommonCorrectionTerm,
+//                            ppnParameterGamma_ );
 
             }
 
@@ -416,12 +435,13 @@ public:
             }
 
             //jw_tudacceleration
-            if (calculate_kinetic_correction) {
+            if (calculate_ext_gravito_correction) {
                 currentAcceleration_ += calculateExtGravitoAcceleration(
                     stateOfAcceleratedBodyWrtCentralBody_.segment(0,3),
                     stateOfAcceleratedBodyWrtCentralBody_.segment(3,3),
                     cb_state.segment(3,3),
-                    commonCorrectionTerm_
+                    commonCorrectionTerm_,
+                    ppnParameterGamma_
                 );
             }
 

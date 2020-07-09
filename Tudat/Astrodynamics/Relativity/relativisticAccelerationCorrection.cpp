@@ -121,6 +121,16 @@ Eigen::Vector3d calculateDeSitterCorrectionAcceleration(
                 ppnParameterGamma );
 }
 
+    Eigen::Vector3d calculateExtPotentialAcceleration(
+        const Eigen::Vector3d& relativePosition,
+        const Eigen::Vector3d& relativePosition_cb_wrt_primary,
+        const double commonCorrectionTerm,
+        const double mu_primary
+    ) {
+        double rab = relativePosition_cb_wrt_primary.norm();
+        return (commonCorrectionTerm*mu_primary/rab)*relativePosition;
+    }
+
     // jw_tudacceleration
     Eigen::Vector3d calculateKineticAcceleration(
             const Eigen::Vector3d& relativePosition,
@@ -128,7 +138,7 @@ Eigen::Vector3d calculateDeSitterCorrectionAcceleration(
             const double commonCorrectionTerm
     ) {
         double v = velocityOfCentralBody.norm();
-        return -commonCorrectionTerm*v*v*relativePosition;
+        return -2.0*commonCorrectionTerm*v*v*relativePosition;
     }
 
     // jw_tudacceleration
@@ -151,9 +161,10 @@ Eigen::Vector3d calculateDeSitterCorrectionAcceleration(
         const Eigen::Vector3d& relativePosition,
         const Eigen::Vector3d& relativeVelocity,
         const Eigen::Vector3d& velocityOfCentralBody,
-        const double commonCorrectionTerm
+        const double commonCorrectionTerm,
+        const double gamma
     ) {
-        return 4.0 * commonCorrectionTerm * (
+        return 2.0 * (gamma + 1.0) * commonCorrectionTerm * (
             velocityOfCentralBody.dot(relativeVelocity) * relativePosition
             - relativePosition.dot(relativeVelocity) * velocityOfCentralBody
         );
